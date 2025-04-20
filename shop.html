@@ -1,0 +1,55 @@
+<body>
+    <header class="bg-light">
+        <div class="container">
+             <!--- Add Remaining Header  -->
+        </div>
+    </header>
+
+    <!--- Products Section -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Our Products</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <!-- Product 1 -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="./assets/portf images/carousel/adidas.jpg" class="card-img-top" alt="Adidas">
+                    <div class="card-body">
+                        <h5 class="card-title">Adidas</h5>
+                        <p class="card-text">Kshs 1500.00</p>
+                        <form action="cart.html" method="GET">
+                            <input type="hidden" name="product" value="Adidas">
+                            <input type="hidden" name="price" value="1500.00">
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="submit" class="btn btn-warning" value="Add to Cart">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Add any additional products here -->
+            <div class="col">
+                <div class="card h-100">
+                    <img src="./assets/portf images/nike-alphafly-next-3-prm-scarpe-da-running-uomo-white-hq3501-100_F_900x.jpg" class="card-img-top" alt="Smart Ring">
+                    <div class="card-body">
+                        <h5 class="card-title">Lorem, ipsum dolor.</h5>
+                        <p class="card-text">Kshs 2999.00</p>
+                        <form action="cart.html" method="GET">
+                            <input type="hidden" name="product" value="Smart Ring">
+                            <input type="hidden" name="price" value="2999.00">
+                            <input type="hidden" name="quantity" value="1">
+                            <input type="submit" class="btn btn-warning" value="Add to Cart">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <!--- Footer -->
+   <footer class="bg-dark text-light py-4 mt-5">
+    <div class="text-center">
+        Copyright &copy;
+        <script>document.write(new Date().getFullYear())</script> Cherus Sportswear. All Rights Reserved
+    </div>
+</footer>
+</body>
+ 
