@@ -1,71 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart - Cherus Sportswear</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+    <!-- Add specific cart styles if needed -->
+    <style>
+        .cart-item img { max-height: 80px; width: auto; }
+        .quantity-input { width: 60px; text-align: center; }
+        .cart-summary { border: 1px solid #eee; padding: 20px; border-radius: 5px; }
+    </style>
+</head>
 <body>
-    <header class="bg-light">
-        <div class="container">
-          <!-- Add Remaining Header -->
-        </div>
-    </header>
-    <header class="py-3">
-        <div class="container">
-            <h1>Your Shopping Cart</h1>
-        </div>
+
+    <!-- Include Header (Copy/paste or use a templating engine if using a backend) -->
+    <header>
+        <!-- ... Your Header HTML ... -->
+         <!-- Make sure the "My Bag" link in header has the badge span -->
+         <li>
+             <a href="cart.html" class="nav__link">
+                 <i class="fas fa-shopping-bag"></i> My Bag
+                 <span class="badge rounded-pill bg-danger cart-badge" id="cartItemCountBadge" style="display: none; vertical-align: top; margin-left: 4px;">0</span>
+             </a>
+         </li>
+         <!-- ... rest of header ... -->
     </header>
 
-    <section class="container my-5">
+    <main class="container my-5">
+        <h1 class="mb-4">Your Shopping Cart</h1>
+
         <div class="row">
+            <!-- Cart Items -->
             <div class="col-md-8">
-                <!-- Cart Items List -->
-                <div class="cart-item">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img src="./assets/portf images/IMG-20250324-WA0040.jpg" class="img-fluid" alt="Product">
-                        </div>
-                        <div class="col-md-5">
-                            <h4>Lorem ipsum dolor sit amet.</h4>
-                            <p>Kshs2800.00</p>
-                        </div>
-                        <div class="col-md-2">
-                            <input type="number" class="form-control" value="1">
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-danger">Remove</button>
-                        </div>
-                    </div>
+                <div id="cartItemsContainer">
+                    <!-- Cart items will be loaded here by JavaScript -->
+                    <div class="text-center p-5">Loading cart items...</div>
                 </div>
-                <!-- Add more cart items here -->
             </div>
 
+            <!-- Cart Summary -->
             <div class="col-md-4">
-                <!-- Cart Summary -->
-                <div class="border p-3 mb-3">
-                    <h3 class="mb-3">Cart Summary</h3>
-                    <div class="d-flex justify-content-between">
+                <div class="cart-summary sticky-top" style="top: 20px;"> <!-- Make summary sticky -->
+                    <h4 class="mb-3">Order Summary</h4>
+                    <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal</span>
-                        <span>Kshs2800.00</span>
+                        <span id="cartSubtotal">Kshs. 0.00</span>
                     </div>
-                    <div class="d-flex justify-content-between">
-                        <span>Tax</span>
-                        <span>Kshs230.92</span>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span id="cartShipping">TBD at Checkout</span> <!-- Or calculate based on rules -->
                     </div>
-                    <div class="d-flex justify-content-between">
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold h5">
                         <span>Total</span>
-                        <span>Kshs3030.92</span>
+                        <span id="cartTotal">Kshs. 0.00</span>
                     </div>
-                    <button class="btn btn-warning w-100 mt-3">Proceed to Checkout</button>
+                    <hr>
+                    <div class="d-grid">
+                        <a href="checkout.html" class="btn btn-warning btn-lg" id="checkoutButton">Proceed to Checkout</a>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="index.html">or Continue Shopping</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </main>
 
-
-    
-
-    <footer class="bg-dark text-light py-4 mt-5">
-        <div class="text-center">
-            Copyright &copy;
-            <script>document.write(new Date().getFullYear())</script> Cherus Sportswear. All Rights Reserved
-        </div>
+    <!-- Include Footer (Copy/paste or use templating) -->
+    <footer>
+        <!-- ... Your Footer HTML ... -->
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-PPmltI4DzdaNfQz9JdGpI3TZfvlw7irzjBn3wKgNmCUp0auj/uTPmSy7Ou1EP9J4" crossorigin="anonymous"></script>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Link to your MAIN JS file first (for getCart, saveCart, etc.) -->
+    <script src="./main.js"></script>
+    <!-- Add a NEW JS file specifically for cart page logic -->
+    <script src="./cart.js"></script>
+
 </body>
- 
+</html>

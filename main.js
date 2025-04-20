@@ -456,3 +456,320 @@ document.addEventListener('DOMContentLoaded', function() {
     */
 
 }); // End DOMContentLoaded
+
+
+
+// Wait for the DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+
+    // --- Product Data ---
+    const allProducts = [
+        // ... (your existing product data) ...
+        { id: 1, name: "Adidas Ultraboost", category: "shoes", subcategory: "running", price: 1500, originalPrice: 1800, discount: 20, imageUrl: "./assets/portf images/carousel/ADIDASBLACKSHOE_370x.jpg", rating: 4.5, reviews: 42, colors: [{name: 'Black', code: 'black'}, {name: 'White', code: 'white'}, {name: 'Blue', code: 'blue'}], description: "Comfortable running shoes with Boost technology.", sizes: ['40', '41', '42', '43', '44'] }, // Added sizes example
+        { id: 2, name: "Nike Air Max", category: "shoes", subcategory: "lifestyle", price: 1800, imageUrl: "./assets/portf images/nike_infinity_react_4.png", rating: 4, reviews: 28, colors: [{name: 'Black', code: 'black'}, {name: 'Red', code: 'red'}], description: "Classic Air Max style with modern comfort.", sizes: ['41', '42', '43'] },
+        // ... Add 'sizes' array to other relevant products
+        { id: 'static-nike', name: "Nike infinity React", category: "shoes", price: 2500, imageUrl: "./assets/portf images/nike_infinity_react_4.png", rating: 4, reviews: 5, description: "Fitness shoe combining style with comfort.", sizes: ['40', '41', '42', '43', '44'] }, // Add static product here too if needed
+        // ... rest of your products
+    ];
+    // --- End Product Data ---
+
+    // --- DOM Elements ---
+    const productsContainer = document.getElementById('productsContainer');
+    const categoryTitleElement = document.getElementById('categoryTitle');
+    const quickViewModalElement = document.getElementById('quickViewModal');
+    const quickViewModal = new bootstrap.Modal(quickViewModalElement);
+    const cartToastElement = document.getElementById('cartToast');
+    const cartToast = new bootstrap.Toast(cartToastElement);
+    const toastMessageElement = document.getElementById('toastMessage');
+    const bannerSection = document.querySelector('.banner-section');
+    const bannerHr = document.querySelector('.banner-hr');
+    const newProductSection = document.querySelector('.new-product-section');
+    const newProductHr = document.querySelector('.new-product-hr');
+    const cartBadge = document.querySelector('.nav__link i.fa-shopping-bag + .cart-badge'); // Add a span for the badge in HTML
+
+    // --- Cart Management ---
+    function getCart() {
+        // Retrieves cart from localStorage or returns an empty array
+        const cart = localStorage.getItem('shoppingCart');
+        return cart ? JSON.parse(cart) : [];
+    }
+
+    function saveCart(cart) {
+        // Saves the cart array to localStorage
+        localStorage.setItem('shoppingCart', JSON.stringify(cart));
+        updateCartBadge(); // Update the visual badge count
+    }
+
+    function addToCart(productId, quantity = 1, selectedSize = null, selectedColor = null) {
+        const cart = getCart();
+        // Find the specific product details (needed for price, name, image)
+        // Make sure your 'static-nike' product ID is handled or consistent
+        const product = allProducts.find(p => p.id == productId); // Use == for potential type difference
+        if (!product) {
+            console.error("Product not found:", productId);
+            return; // Don't add if product details aren't found
+        }
+
+        // Create a unique ID for cart items if size/color matter
+        // Example: '1-42-Black'
+        const cartItemId = `${productId}${selectedSize ? '-' + selectedSize : ''}${selectedColor ? '-' + selectedColor : ''}`;
+
+        const existingItemIndex = cart.findIndex(item => item.cartItemId === cartItemId);
+
+        if (existingItemIndex > -1) {
+            // Item already exists (same product, size, color), update quantity
+            cart[existingItemIndex].quantity += quantity;
+        } else {
+            // Add new item to cart
+            cart.push({
+                cartItemId: cartItemId, // Use the unique ID
+                id: product.id,         // Original product ID
+                name: product.name,
+                price: product.price,
+                quantity: quantity,
+                imageUrl: product.imageUrl, // Store image for cart page
+                size: selectedSize,
+                color: selectedColor
+            });
+        }
+        saveCart(cart);
+        showToast(`${product.name} added to cart!`);
+
+         // Optional: Animate button (as you had before)
+         const button = document.querySelector(`[data-product-id="${productId}"].add-to-cart, [data-product-id="${productId}"].add-to-cart-static, #modalAddToCartBtn[data-product-id="${productId}"]`);
+         if(button && !button.classList.contains('modal-add-to-cart-btn')) { // Avoid animation conflict if modal button triggered it
+             animateAddToCartButton(button);
+         }
+    }
+
+    function updateCartBadge() {
+        const cart = getCart();
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badgeElement = document.getElementById('cartItemCountBadge'); // Get the badge span
+
+        if (badgeElement) {
+            if (totalItems > 0) {
+                badgeElement.textContent = totalItems;
+                badgeElement.style.display = 'inline-block'; // Show badge
+            } else {
+                badgeElement.style.display = 'none'; // Hide badge if cart is empty
+            }
+        }
+         console.log("Cart badge updated:", totalItems);
+    }
+
+     function animateAddToCartButton(button) {
+         if (!button) return;
+         const originalText = button.textContent; // Store original text if needed
+         button.innerHTML = '<i class="fas fa-check me-1"></i>Added';
+         button.classList.remove('btn-warning');
+         button.classList.add('btn-success', 'disabled');
+
+         setTimeout(() => {
+             button.innerHTML = originalText === 'Add to Cart' ? 'Add to Cart' : '<i class="far fa-heart"></i> Add to Wishlist'; // Restore appropriate text
+             button.classList.remove('btn-success', 'disabled');
+             button.classList.add('btn-warning'); // Or original classes
+             // Make sure modal button text is correct
+             if (button.id === 'modalAddToCartBtn') button.innerHTML = 'Add to Cart';
+         }, 1500);
+     }
+
+
+    // --- Hamburger Menu ---
+    // ... (keep existing hamburger logic) ...
+
+    // --- Dropdown Menu Logic ---
+    // ... (keep existing dropdown logic) ...
+
+    // --- Carousel ---
+    // ... (keep existing carousel logic) ...
+
+    // --- Filtering and Display Logic ---
+    // ... (keep existing functions: getQueryParams, filterProducts, generateStarRating, displayProducts) ...
+
+    // --- Function to Attach Event Listeners ---
+    function attachProductEventListeners() {
+        // Quick View Buttons
+        document.querySelectorAll('.quick-view-btn').forEach(button => {
+            button.removeEventListener('click', handleQuickViewClick);
+            button.addEventListener('click', handleQuickViewClick);
+        });
+
+        // Wishlist Buttons
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            btn.removeEventListener('click', handleWishlistClick);
+            btn.addEventListener('click', handleWishlistClick);
+        });
+
+        // Add to Cart Buttons (Grid)
+        document.querySelectorAll('.product-card .add-to-cart').forEach(button => {
+            button.removeEventListener('click', handleAddToCartGridClick); // Use specific handler
+            button.addEventListener('click', handleAddToCartGridClick);
+        });
+
+        // Add to Cart (Static Section)
+        document.querySelectorAll('.add-to-cart-static').forEach(button => {
+            button.removeEventListener('click', handleAddToCartStaticClick); // Use specific handler
+            button.addEventListener('click', handleAddToCartStaticClick);
+        });
+
+         // Add to Cart (Modal) - Listener attached separately below
+    }
+
+    // --- Event Handlers ---
+
+    function handleQuickViewClick(event) {
+        const productId = event.currentTarget.dataset.productId;
+        const product = allProducts.find(p => p.id == productId);
+
+        if (!product) return;
+
+        // Populate Modal (keep existing population logic)
+        document.getElementById('modalProductTitleContent').textContent = product.name;
+        document.getElementById('modalProductPrice').textContent = `Kshs. ${product.price.toFixed(2)}`;
+        // ... (rest of your modal population code) ...
+
+        // Handle Sizes in Modal
+        const sizeContainer = document.getElementById('modalSizeOptions');
+        const sizeContainerWrapper = document.getElementById('modalSizeOptionsContainer');
+        if (product.sizes && product.sizes.length > 0) {
+             sizeContainer.innerHTML = product.sizes.map((size, index) => `
+                <input type="radio" class="btn-check" name="modalSize" id="modalSize${index}" value="${size}" autocomplete="off" ${index === 0 ? 'checked' : ''}>
+                <label class="btn btn-outline-secondary" for="modalSize${index}">${size}</label>
+            `).join('');
+            sizeContainerWrapper.style.display = 'block';
+        } else {
+             sizeContainer.innerHTML = '';
+             sizeContainerWrapper.style.display = 'none';
+        }
+
+        // Handle Colors in Modal
+        const colorContainer = document.getElementById('modalColorOptions');
+        const colorContainerWrapper = document.getElementById('modalColorOptionsContainer');
+         if (product.colors && product.colors.length > 0) {
+             colorContainer.innerHTML = product.colors.map((color, index) => `
+                 <input type="radio" class="btn-check color-radio" name="modalColor" id="modalColor${index}" value="${color.name}" data-color-code="${color.code}" autocomplete="off" ${index === 0 ? 'checked' : ''}>
+                 <label class="color-swatch large" for="modalColor${index}" style="background-color: ${color.code}; border: ${color.code.toLowerCase() === '#ffffff' || color.code.toLowerCase() === 'white' ? '1px solid #ccc' : 'none'}" title="${color.name}"></label>
+             `).join('');
+             colorContainerWrapper.style.display = 'block';
+         } else {
+             colorContainer.innerHTML = '';
+             colorContainerWrapper.style.display = 'none';
+         }
+
+
+        // Reset quantity
+        document.getElementById('quantityInput').value = '1';
+
+        // Update modal buttons' data attributes
+        document.getElementById('modalAddToCartBtn').dataset.productId = product.id;
+        document.getElementById('modalAddToWishlistBtn').dataset.productId = product.id;
+        document.getElementById('modalAddToCartBtn').classList.add('modal-add-to-cart-btn'); // Add class to identify modal button
+
+        // Ensure modal Add to Cart listener is present (attach here)
+        const modalAddToCartBtn = document.getElementById('modalAddToCartBtn');
+        modalAddToCartBtn.removeEventListener('click', handleAddToCartModalClick); // Remove previous if any
+        modalAddToCartBtn.addEventListener('click', handleAddToCartModalClick); // Add fresh listener
+    }
+
+    function handleWishlistClick(event) {
+        // ... (keep existing wishlist logic) ...
+        showToast("Wishlist functionality not fully implemented yet."); // Placeholder message
+        event.stopPropagation();
+    }
+
+    function handleAddToCartGridClick(event) {
+        const button = event.currentTarget;
+        const card = button.closest('.product-card');
+        const productId = card.dataset.productId;
+        // For grid items, size/color are usually chosen on product page or modal
+        // For this simplified version, we add without size/color
+        addToCart(productId, 1);
+        animateAddToCartButton(button); // Animate this specific button
+    }
+     function handleAddToCartStaticClick(event) {
+         const button = event.currentTarget;
+         const productId = button.dataset.productId; // Should be 'static-nike'
+         // Add the static product - assuming no size/color selection here
+         addToCart(productId, 1);
+         animateAddToCartButton(button); // Animate this specific button
+     }
+
+    function handleAddToCartModalClick(event) {
+        const button = event.currentTarget;
+        const productId = button.dataset.productId;
+        const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+
+        // Get selected size (if available)
+        const selectedSizeInput = document.querySelector('#modalSizeOptions input[name="modalSize"]:checked');
+        const selectedSize = selectedSizeInput ? selectedSizeInput.value : null;
+
+        // Get selected color (if available)
+        const selectedColorInput = document.querySelector('#modalColorOptions input[name="modalColor"]:checked');
+        const selectedColor = selectedColorInput ? selectedColorInput.value : null;
+
+        addToCart(productId, quantity, selectedSize, selectedColor);
+        animateAddToCartButton(button); // Animate modal button
+        quickViewModal.hide(); // Optionally close modal after adding
+    }
+
+
+     // --- Modal Quantity Controls ---
+     // ... (keep existing quantity control logic) ...
+
+    // --- Toast Notification ---
+    function showToast(message) {
+        toastMessageElement.textContent = message;
+        cartToast.show();
+    }
+
+    // --- Initial Page Load Logic ---
+    function initializePage() {
+        const params = getQueryParams();
+        // Pre-process products to have a display category (e.g., capitalize)
+        const processedProducts = allProducts.map(p => ({
+            ...p,
+            categoryDisplay: p.category.charAt(0).toUpperCase() + p.category.slice(1)
+        }));
+
+        const filtered = filterProducts(processedProducts, params);
+
+        // Update Title logic (keep existing)
+        if (params.category) {
+           // ... (your existing title update logic) ...
+             // Optionally hide banner/new product section
+            if (bannerSection) bannerSection.style.display = 'none';
+            if (bannerHr) bannerHr.style.display = 'none';
+            if (newProductSection) newProductSection.style.display = 'none';
+            if (newProductHr) newProductHr.style.display = 'none';
+        } else {
+            categoryTitleElement.textContent = "Featured Products";
+            // Show banner/new product section
+             if (bannerSection) bannerSection.style.display = 'flex'; // Or 'block'
+             if (bannerHr) bannerHr.style.display = 'block';
+            if (newProductSection) newProductSection.style.display = 'flex'; // Or 'block' depending on layout
+            if (newProductHr) newProductHr.style.display = 'block';
+        }
+
+        displayProducts(filtered, productsContainer);
+
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        updateCartBadge(); // Initial cart badge update on page load
+    }
+
+    // Run the initialization logic when the page loads
+    initializePage();
+
+    // Load More (keep commented out or implement pagination/infinite scroll later)
+    /*
+    document.getElementById('loadMoreBtn').addEventListener('click', function() {
+        // ...
+    });
+    */
+
+}); // End DOMContentLoaded
