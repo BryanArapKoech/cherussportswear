@@ -14,11 +14,112 @@
 </head>
 
 <body>
-    <header class="bg-light">
-        <div class="container">
-             <!--- Add Remaining Header  -->
-        </div>
-    </header>
+    <header>
+        
+        <!-- Top Navbar -->
+   <div class="top-navbar">
+       <div class="top-navbar__content">
+           <section class="logo">
+               <a href="index.html" class="nav__logo"> <!-- Point home link to index.html -->
+                   <img src="./assets/favicon.svg" alt="logo" class="logo__img">
+                   <span class="logo__text">Cherus Sportswear</span>
+               </a>
+           </section>
+           <section class="search">
+               <form action="https://www.google.com/search" method="get" class="search_bar">
+                   <input type="text" placeholder="Search for any product..." name="q"> <!-- 'q' for Google Search -->
+                   <button type="submit"><img src="./assets/icons/searchblack.svg" width="25" height="25" alt="search_icon"></button>
+               </form>
+           </section>
+           <div class="hamburger" id="hamburger-menu">
+               <div class="bar"></div>
+               <div class="bar"></div>
+               <div class="bar"></div>
+           </div>
+           <section class="phone">
+               <i class="fa-solid fa-phone icon"></i>
+               +254(721)370738
+           </section>
+       </div>
+   </div>
+
+   <!-- Bottom Navbar -->
+   <div class="bottom-navbar">
+       <div class="bottom-navbar__content">
+           <nav class="nav-container">
+               <div class="nav__menu" id="nav-menu">
+                   <ul class="nav__list">
+                       <li><a href="index.html" class="nav__link">Home</a></li>
+
+                       <!-- About Us Dropdown -->
+                       <li class="dropdown__item">
+                           <div class="nav__link">
+                               About Us <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                           </div>
+                           <ul class="dropdown__menu">
+                               <li>
+                                   <a href="about.html#mission" class="dropdown__link"> <!--  Link to specific sections  -->
+                                       <i class="ri-user-line"></i> Our Mission
+                                   </a>
+                               </li>
+                               <li>
+                                   <a href="about.html#vision" class="dropdown__link">
+                                       <i class="ri-lock-line"></i> Our Vision
+                                   </a>
+                               </li>
+                           </ul>
+                       </li>
+
+                       <!-- Shop Dropdown -->
+                       <li class="dropdown__item">
+                            <div class="nav__link"> <!--  link to the main shop page -->
+                               Shop <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                           </div>
+                           <ul class="dropdown__menu">
+                               <li><a href="index.html?category=shoes" class="dropdown__link" data-category="shoes">Shoes</a></li>
+                               <li><a href="index.html?category=fullsuit" class="dropdown__link" data-category="fullsuit">Fullsuit</a></li>
+                               <li><a href="index.html?category=vests" class="dropdown__link" data-category="vests">Vests</a></li>
+                               
+                               <!-- Equipment Submenu -->
+                               <li class="dropdown__subitem">
+                                   <div class="dropdown__link"> 
+                                       Equipment <i class="ri-add-line dropdown__add"></i>
+                                   </div>
+                                   <ul class="dropdown__submenu">
+                                       <li><a href="index.html?category=equipment&subcategory=balls" class="dropdown__sublink" data-category="equipment" data-subcategory="balls">Balls</a></li>
+                                       <li><a href="index.html?category=equipment&subcategory=nets" class="dropdown__sublink" data-category="equipment" data-subcategory="nets">Nets</a></li>
+                                       <li><a href="index.html?category=equipment&subcategory=bags" class="dropdown__sublink" data-category="equipment" data-subcategory="bags">Bags</a></li>
+                                       <li><a href="index.html?category=equipment&subcategory=cones" class="dropdown__sublink" data-category="equipment" data-subcategory="cones">Cones</a></li>
+                                       <li><a href="index.html?category=equipment&subcategory=ankle-support" class="dropdown__sublink" data-category="equipment" data-subcategory="ankle-support">Ankle support</a></li>
+                                       <li><a href="index.html?category=equipment&subcategory=sleeve" class="dropdown__sublink" data-category="equipment" data-subcategory="sleeve">Sleeve</a></li>
+                                   </ul>
+                               </li>
+                               <li><a href="index.html?category=gloves" class="dropdown__link" data-category="gloves">Gloves</a></li>
+                               <li><a href="index.html?category=jackets" class="dropdown__link" data-category="jackets">Jackets</a></li>
+                               <li><a href="index.html?category=caps" class="dropdown__link" data-category="caps">Caps</a></li>
+                               <li><a href="index.html?category=shorts" class="dropdown__link" data-category="shorts">Shorts</a></li>
+                               <li><a href="index.html?category=t-shirts" class="dropdown__link" data-category="t-shirts">T-shirts</a></li>
+                               <li><a href="index.html?category=socks" class="dropdown__link" data-category="socks">Socks</a></li>
+                           </ul>
+                       </li>
+
+                       
+                       <li><a href="./login.html" class="btn">Login</a></li>
+                       <li><a href="./wishlist.html" class="nav__link"><i class="fas fa-heart"></i> Wishlist</a></li>
+        <li>
+            <a href="cart.html" class="nav__link">
+                <i class="fas fa-shopping-bag"></i> My Bag
+                <span class="badge rounded-pill bg-danger cart-badge" id="cartItemCountBadge" 
+                style="display: none; vertical-align: top; margin-left: 4px;">0
+               </span>
+            </a>
+        </li>
+       </ul>
+   </div>
+</nav>
+</div>
+</div>
+   </header>
 
     <!--- Products Section -->
     <div class="container my-5">

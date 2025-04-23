@@ -6,37 +6,107 @@ document.addEventListener('DOMContentLoaded', function() {
         // Shoes
         { id: 1, name: "Adidas Ultraboost", category: "shoes", subcategory: "running", price: 1500, originalPrice: 1800, discount: 20, imageUrl: "./assets/portf images/carousel/ADIDASBLACKSHOE_370x.jpg", rating: 4.5, reviews: 42, colors: [{name: 'Black', code: 'black'}, {name: 'White', code: 'white'}, {name: 'Blue', code: 'blue'}], description: "Comfortable running shoes with Boost technology." },
         { id: 2, name: "Nike Air Max", category: "shoes", subcategory: "lifestyle", price: 1800, imageUrl: "./assets/portf images/nike_infinity_react_4.png", rating: 4, reviews: 28, colors: [{name: 'Black', code: 'black'}, {name: 'Red', code: 'red'}], description: "Classic Air Max style with modern comfort." },
-        { id: 5, name: "New Balance 574", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf images/carousel/yonex.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 3, name: "Adidas", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/adidas.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 4, name: "CASCADE ACCEL WHITE", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/CASCADEACCELWHITE_900x.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 5, name: "Quality shoes", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0046.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 6, name: "New Balance 574", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0047.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 7, name: "Nike", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0066.jpg", rating: 4, reviews: 22, colors: [{name: 'Green', code: 'green'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 8, name: "Nike black", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0067.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 9, name: "Nike", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0069.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 10, name: "New Balance 574", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0072.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 11, name: "Nike", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0074.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 12, name: "Nike boots", category: "shoes", subcategory: "sports", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0077.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 13, name: "Sport boots", category: "shoes", subcategory: "sports", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0078.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 14, name: "Nike boots", category: "shoes", subcategory: "sport", price: 1650, imageUrl: "./assets/portf_images/shoes/IMG-20250324-WA0085.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 15, name: "Isaac Wendland", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/isaac-wendland-YbubEOFyKZU-unsplash-1536x1024.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 16, name: "Nike", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/nike.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 17, name: "Nike", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/nike_design2.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 18, name: "Nike", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/nike1.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 19, name: "Nike", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/nike3.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 20, name: "Nike Alphafly Next 3", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/nike-alphafly-next-3-prm-scarpe-da-running-uomo-white-hq3501-100_F_900x.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 21, name: "YOnex", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/STRIDER2_900x.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        { id: 22, name: "New Balance 574", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "../assets/portf_images/shoes/WhatsApp_Image_2021-11-13_at_10.30.10_1944x.webp", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
+        
+
         // Fullsuits
-        { id: 10, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 60, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 61, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 62, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 63, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 64, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 65, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 66, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 67, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+        { id: 68, name: "Track Fullsuit", category: "fullsuit", price: 3500, imageUrl: "./assets/placeholder.png", rating: 4, reviews: 15, colors: [{name: 'Navy', code: 'navy'}, {name: 'Black', code: 'black'}], description: "Comfortable tracksuit for training or casual wear." },
+
         // Vests
-        { id: 11, name: "Running Vest", category: "vests", price: 900, imageUrl: "./assets/placeholder.png", rating: 4.2, reviews: 10, colors: [{name: 'Yellow', code: 'yellow'}, {name: 'Orange', code: 'orange'}], description: "Lightweight and breathable vest for running." },
+        { id: 101, name: "Running Vest", category: "vests", price: 900, imageUrl: "./assets/placeholder.png", rating: 4.2, reviews: 10, colors: [{name: 'Yellow', code: 'yellow'}, {name: 'Orange', code: 'orange'}], description: "Lightweight and breathable vest for running." },
         // Equipment - Balls
-        { id: 12, name: "Standard Football Size 5", category: "equipment", subcategory: "balls", price: 1500, imageUrl: "./assets/placeholder.png", rating: 4.5, reviews: 30, description: "Durable football for practice and matches." },
-        { id: 13, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 150, name: "Standard Football Size 5", category: "equipment", subcategory: "balls", price: 1500, imageUrl: "./assets/placeholder.png", rating: 4.5, reviews: 30, description: "Durable football for practice and matches." },
+        { id: 151, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 152, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 153, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 154, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 155, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 156, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 157, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 158, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 159, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 160, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 161, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 162, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 163, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 164, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
+        { id: 165, name: "Basketball Official Size", category: "equipment", subcategory: "balls", price: 1800, imageUrl: "./assets/placeholder.png", rating: 4.6, reviews: 25, description: "Official size and weight basketball." },
         // Equipment - Nets
-        { id: 14, name: "Portable Soccer Goal Net", category: "equipment", subcategory: "nets", price: 2500, imageUrl: "./assets/placeholder.png", rating: 4.0, reviews: 8, description: "Easy setup portable goal net." },
+        { id: 214, name: "Portable Soccer Goal Net", category: "equipment", subcategory: "nets", price: 2500, imageUrl: "./assets/placeholder.png", rating: 4.0, reviews: 8, description: "Easy setup portable goal net." },
         // Equipment - Bags
-        { id: 15, name: "Durable Sports Duffel Bag", category: "equipment", subcategory: "bags", price: 2000, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 18, description: "Spacious bag for all your gear." },
+        { id: 215, name: "Durable Sports Duffel Bag", category: "equipment", subcategory: "bags", price: 2000, imageUrl: "./assets/portf images/accesories/Bag-of-sports-accessories.jpg", rating: 4.3, reviews: 18, description: "Spacious bag for all your gear." },
         // Equipment - Cones
-        { id: 16, name: "Training Cones (Set of 10)", category: "equipment", subcategory: "cones", price: 1000, imageUrl: "./assets/portf images/IMG-20250324-WA0048.jpg", rating: 4.0, reviews: 12, description: "Set of 10 marker cones for drills." }, // Used existing image
+        { id: 216, name: "Training Cones (Set of 10)", category: "equipment", subcategory: "cones", price: 1000, imageUrl: "./assets/portf images/IMG-20250324-WA0048.jpg", rating: 4.0, reviews: 12, description: "Set of 10 marker cones for drills." }, // Used existing image
         // Equipment - Ankle Support
-        { id: 17, name: "Adjustable Ankle Support", category: "equipment", subcategory: "ankle-support", price: 800, imageUrl: "./assets/placeholder.png", rating: 4.7, reviews: 22, description: "Provides stability and compression for ankles." },
+        { id: 217, name: "Adjustable Ankle Support", category: "equipment", subcategory: "ankle-support", price: 800, imageUrl: "./assets/placeholder.png", rating: 4.7, reviews: 22, description: "Provides stability and compression for ankles." },
         // Equipment - Sleeve
-        { id: 18, name: "Compression Leg Sleeve", category: "equipment", subcategory: "sleeve", price: 700, imageUrl: "./assets/placeholder.png", rating: 4.4, reviews: 16, description: "Improves blood flow and muscle support." },
+        { id: 218, name: "Compression Leg Sleeve", category: "equipment", subcategory: "sleeve", price: 700, imageUrl: "./assets/placeholder.png", rating: 4.4, reviews: 16, description: "Improves blood flow and muscle support." },
         // Gloves
-        { id: 19, name: "Goalkeeper Gloves", category: "gloves", price: 1900, imageUrl: "./assets/placeholder.png", rating: 4.1, reviews: 9, description: "Professional grip goalkeeper gloves." },
+        { id: 219, name: "Goalkeeper Gloves", category: "gloves", price: 1900, imageUrl: "./assets/placeholder.png", rating: 4.1, reviews: 9, description: "Professional grip goalkeeper gloves." },
         // Jackets
-        { id: 8, name: "Reebok Classic Hoodie", category: "jackets", price: 1800, imageUrl: "./assets/portf images/nike-alphafly-next-3-prm-scarpe-da-running-uomo-white-hq3501-100_F_900x.jpg", rating: 3, reviews: 12, colors: [{name: 'Gray', code: 'gray'}, {name: 'Black', code: 'black'}], description: "Comfortable and stylish hoodie." },
-        { id: 20, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 308, name: "Reebok Classic Hoodie", category: "jackets", price: 1800, imageUrl: "./assets/portf images/nike-alphafly-next-3-prm-scarpe-da-running-uomo-white-hq3501-100_F_900x.jpg", rating: 3, reviews: 12, colors: [{name: 'Gray', code: 'gray'}, {name: 'Black', code: 'black'}], description: "Comfortable and stylish hoodie." },
+        { id: 320, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 420, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 250, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 203, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 207, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2036, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 209, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 420, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 520, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 620, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 720, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 820, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 920, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 1020, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2010, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2065, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2650, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 207, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2032, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2052, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2012, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2980, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2009, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 20098, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },{ id: 20, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2091, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },{ id: 20, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+        { id: 2132, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },{ id: 20, name: "Windbreaker Jacket", category: "jackets", price: 2200, imageUrl: "./assets/placeholder.png", rating: 4.3, reviews: 11, description: "Lightweight protection against wind and light rain." },
+
         // Caps
-        { id: 6, name: "Adidas Classic Cap", category: "caps", price: 500, imageUrl: "./assets/portf images/IMG-20250324-WA0058.jpg", rating: 3.5, reviews: 14, colors: [{name: 'Black', code: 'black'}, {name: 'White', code: 'white'}, {name: 'Red', code: 'red'}], description: "A classic adjustable cap." },
+        { id: 67, name: "Adidas Classic Cap", category: "caps", price: 500, imageUrl: "./assets/portf images/IMG-20250324-WA0058.jpg", rating: 3.5, reviews: 14, colors: [{name: 'Black', code: 'black'}, {name: 'White', code: 'white'}, {name: 'Red', code: 'red'}], description: "A classic adjustable cap." },
         // Shorts
-        { id: 4, name: "Under Armour Shorts", category: "shorts", price: 1200, imageUrl: "./assets/portf images/IMG-20250324-WA0048.jpg", rating: 5, reviews: 35, discount: 'New', colors: [{name: 'Black', code: 'black'}, {name: 'Navy', code: 'navy'}], description: "Comfortable training shorts." },
+        { id: 4989, name: "Under Armour Shorts", category: "shorts", price: 1200, imageUrl: "./assets/portf images/IMG-20250324-WA0048.jpg", rating: 5, reviews: 35, discount: 'New', colors: [{name: 'Black', code: 'black'}, {name: 'Navy', code: 'navy'}], description: "Comfortable training shorts." },
         // T-shirts
-        { id: 3, name: "Puma Sport T-Shirt", category: "t-shirts", price: 800, imageUrl: "./assets/portf images/STRRIPEDTSHIRTSS_900x.jpg", rating: 3.5, reviews: 19, colors: [{name: 'Gray', code: 'gray'}, {name: 'White', code: 'white'}, {name: 'Green', code: 'green'}], description: "Breathable cotton t-shirt for workouts." },
+        { id: 3979, name: "Puma Sport T-Shirt", category: "t-shirts", price: 800, imageUrl: "./assets/portf images/STRRIPEDTSHIRTSS_900x.jpg", rating: 3.5, reviews: 19, colors: [{name: 'Gray', code: 'gray'}, {name: 'White', code: 'white'}, {name: 'Green', code: 'green'}], description: "Breathable cotton t-shirt for workouts." },
         // Socks
-        { id: 7, name: "Nike Running Socks (3 Pack)", category: "socks", price: 300, originalPrice: 350, discount: 15, imageUrl: "./assets/portf images/IMG-20250324-WA0044.jpg", rating: 5, reviews: 47, colors: [{name: 'Black', code: 'black'}, {name: 'White', code: 'white'}], description: "Comfortable and supportive running socks." },
+        { id: 7087, name: "Nike Running Socks (3 Pack)", category: "socks", price: 300, originalPrice: 350, discount: 15, imageUrl: "./assets/portf images/IMG-20250324-WA0044.jpg", rating: 5, reviews: 47, colors: [{name: 'Black', code: 'black'}, {name: 'White', code: 'white'}], description: "Comfortable and supportive running socks." },
         // Add more products as needed... remember to use './assets/placeholder.png' if you don't have an image yet.
     ];
     // --- End Product Data ---
@@ -575,18 +645,6 @@ document.addEventListener('DOMContentLoaded', function() {
      }
 
 
-    // --- Hamburger Menu ---
-    // ... (keep existing hamburger logic) ...
-
-    // --- Dropdown Menu Logic ---
-    // ... (keep existing dropdown logic) ...
-
-    // --- Carousel ---
-    // ... (keep existing carousel logic) ...
-
-    // --- Filtering and Display Logic ---
-    // ... (keep existing functions: getQueryParams, filterProducts, generateStarRating, displayProducts) ...
-
     // --- Function to Attach Event Listeners ---
     function attachProductEventListeners() {
         // Quick View Buttons
@@ -714,8 +772,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-     // --- Modal Quantity Controls ---
-     // ... (keep existing quantity control logic) ...
+     
 
     // --- Toast Notification ---
     function showToast(message) {
@@ -736,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update Title logic (keep existing)
         if (params.category) {
-           // ... (your existing title update logic) ...
+           // ... (title update logic) ...
              // Optionally hide banner/new product section
             if (bannerSection) bannerSection.style.display = 'none';
             if (bannerHr) bannerHr.style.display = 'none';

@@ -1,0 +1,1 @@
+{ id: 4, name: "CASCADE ACCEL WHITE", category: "shoes", subcategory: "casual", price: 1650, imageUrl: "./assets/portf_images/shoes/CASCADEACCELWHITE_900x.jpg", rating: 4, reviews: 22, colors: [{name: 'Gray', code: 'gray'}, {name: 'Navy', code: 'navy'}], description: "Versatile and stylish casual sneakers." },
