@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const db = require('./models'); // Loads models and Sequelize connection
+const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const mpesaRoutes = require('./routes/mpesaRoutes');
 const errorHandler = require('./middleware/errorHandler');
@@ -12,11 +13,25 @@ const FRONTEND_URL = process.env.FRONTEND_URL || '*'; // Be more specific in pro
 
 // --- Middleware ---
 // CORS Configuration
-const corsOptions = {
-    origin: FRONTEND_URL, // Allow requests only from your frontend URL
-    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-app.use(cors(corsOptions));
+const allowedOrigins = [
+    'http://localhost:5500',
+    'http://127.0.0.1:5500'
+  ];
+  
+  const corsOptions = {
+    origin: (origin, callback) => {
+      // Allow requests with no origin like mobile apps or curl
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS Error: Origin ${origin} not allowed`));
+      }
+    },
+    optionsSuccessStatus: 200
+  };
+  
+  app.use(cors(corsOptions));
+  
 
 // Body Parsers
 app.use(express.json()); // Parse JSON bodies
@@ -31,6 +46,7 @@ app.use((req, res, next) => {
 // --- API Routes ---
 app.use('/api/orders', orderRoutes);
 app.use('/api/mpesa', mpesaRoutes);
+app.use('/api/products', productRoutes);
 
 // --- Basic Health Check Route ---
 app.get('/', (req, res) => {
@@ -48,8 +64,8 @@ const startServer = async () => {
         await db.sequelize.authenticate();
         console.log('Database connection has been established successfully.');
 
-        // Sync database schema (Use migrations in production!)
-        // In development, { alter: true } or { force: true } can be useful, but BE CAREFUL with force: true (drops tables)
+        
+        
         if (process.env.NODE_ENV === 'development') {
              // await db.sequelize.sync({ alter: true }); // Tries to alter tables to match models
              // console.log('Database synchronized (alter).');
@@ -60,7 +76,7 @@ const startServer = async () => {
         // Start the Express server
         app.listen(PORT, () => {
             console.log(`Server listening on port ${PORT}`);
-            console.log(`Allowed frontend origin (CORS): ${FRONTEND_URL}`);
+            console.log(`Allowed frontend origins (CORS): ${allowedOrigins.join(', ')}`);
             console.log(`M-Pesa Environment: ${process.env.MPESA_ENVIRONMENT}`);
             console.log(`M-Pesa Callback URL: ${process.env.MPESA_CALLBACK_URL}`);
         });
