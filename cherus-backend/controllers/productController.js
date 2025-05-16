@@ -1,41 +1,35 @@
 const { Product } = require('../models');
-const { Op } = require('sequelize'); // Import Operators for advanced querying
+const { Op } = require('sequelize'); // For more complex queries like search
 
+// Fetch all products with pagination, filtering, and sorting
 exports.getAllProducts = async (req, res, next) => {
     try {
-        // --- Filtering ---
-        const { category, subcategory, search, isFeatured } = req.query;
-        const whereClause = {};
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 12; // Products per page
+        const offset = (page - 1) * limit;
 
+        const { category, subcategory, sort, q: searchQuery } = req.query;
+
+        let whereClause = {};
+        let orderClause = [];
+
+        // Filtering
         if (category && category !== 'all') {
-             // Simple category mapping (expand as needed like in main.js)
-             if (category.toLowerCase() === 'clothing') {
-                 whereClause.category = { [Op.in]: ['clothing', 'fullsuit', 'vests', 'jackets', 'shorts', 't-shirts', 'socks'] };
-             } else if (category.toLowerCase() === 'accessories') {
-                 whereClause.category = { [Op.in]: ['accessories', 'gloves', 'caps', 'bags'] }; // Example
-             } else if (category.toLowerCase() === 'equipment') {
-                 whereClause.category = { [Op.in]: ['equipment', 'balls', 'nets', 'cones', 'ankle-support', 'sleeve'] }; // Example
-             } else {
-                 whereClause.category = category;
-             }
+            whereClause.category = category;
         }
         if (subcategory) {
             whereClause.subcategory = subcategory;
         }
-        if (search) {
-            const searchTerm = `%${search}%`; // Prepare for LIKE query
-            whereClause[Op.or] = [ // Search in name OR description
-                { name: { [Op.iLike]: searchTerm } }, // Case-insensitive like
-                { description: { [Op.iLike]: searchTerm } }
+        if (searchQuery) {
+            whereClause[Op.or] = [
+                { name: { [Op.iLike]: `%${searchQuery}%` } }, // Case-insensitive search
+                { description: { [Op.iLike]: `%${searchQuery}%` } },
+                { category: { [Op.iLike]: `%${searchQuery}%` } },
+                { subcategory: { [Op.iLike]: `%${searchQuery}%` } },
             ];
         }
-         if (isFeatured === 'true') { // Filter for featured products if requested
-             whereClause.isFeatured = true;
-         }
 
-        // --- Sorting ---
-        const { sort } = req.query;
-        let orderClause = [];
+        // Sorting
         switch (sort) {
             case 'price-low':
                 orderClause.push(['price', 'ASC']);
@@ -44,64 +38,53 @@ exports.getAllProducts = async (req, res, next) => {
                 orderClause.push(['price', 'DESC']);
                 break;
             case 'newest':
-                orderClause.push(['dateAdded', 'DESC']); // Assumes dateAdded field exists
+                orderClause.push(['createdAt', 'DESC']); // Assumes timestamps are enabled
                 break;
-            case 'featured': // Could combine with isFeatured flag or a rating/popularity score
+            case 'featured': // You might sort by isFeatured then by another criteria
+                orderClause.push(['isFeatured', 'DESC'], ['createdAt', 'DESC']);
+                break;
             default:
-                // Default sort order (e.g., by date added or name)
-                orderClause.push(['dateAdded', 'DESC']);
-                orderClause.push(['name', 'ASC']);
+                orderClause.push(['createdAt', 'DESC']); // Default sort
         }
 
-        // --- Pagination ---
-        const page = parseInt(req.query.page) || 1; // Default to page 1
-        const limit = parseInt(req.query.limit) || 8; // Default limit (e.g., 8 products per page)
-        const offset = (page - 1) * limit;
-
-        // --- Database Query ---
-        const { count, rows } = await Product.findAndCountAll({
+        const { count, rows: products } = await Product.findAndCountAll({
             where: whereClause,
             order: orderClause,
             limit: limit,
             offset: offset,
-            // Add distinct: true if needed with includes later
         });
 
-        // --- Send Response ---
         res.status(200).json({
+            products,
             totalPages: Math.ceil(count / limit),
             currentPage: page,
-            totalProducts: count,
-            products: rows, // The actual product data for the current page
+            totalProducts: count
         });
-
     } catch (error) {
-        console.error("Error fetching products:", error);
-        next(error); // Pass error to the handler
+        next(error);
     }
-    exports.getAllProducts = async (req, res, next) => {
-        try {
-            // ... (filtering and sorting setup) ...
-            console.log('WHERE Clause:', JSON.stringify(whereClause, null, 2)); // Log the filter criteria
-            console.log('ORDER Clause:', orderClause);                        // Log the sort criteria
-            console.log('LIMIT:', limit, 'OFFSET:', offset);                 // Log pagination
-    
-            const { count, rows } = await Product.findAndCountAll({
-                where: whereClause,
-                order: orderClause,
-                limit: limit,
-                offset: offset,
-            });
-    
-            console.log('DB Query Result - Count:', count);                // Log the total count found
-            console.log('DB Query Result - Rows:', rows.length);           // Log how many rows returned for this page
-    
-            // ... (rest of the function - sending response) ...
-    
-        } catch (error) {
-            console.error("Error fetching products:", error); // Log any caught errors
-            next(error);
-        }
-    };
 };
 
+// Fetch a single product by ID
+exports.getProductById = async (req, res, next) => {
+    try {
+        const product = await Product.findByPk(req.params.id);
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+        res.status(200).json(product);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// (Admin only - for later) Create a new product
+exports.createProduct = async (req, res, next) => {
+    try {
+        // Add validation for req.body here
+        const product = await Product.create(req.body);
+        res.status(201).json(product);
+    } catch (error) {
+        next(error);
+    }
+};

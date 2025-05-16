@@ -4,30 +4,42 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Product extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+    
     static associate(models) {
       // define association here
     }
   }
   Product.init({
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     description: DataTypes.TEXT,
-    price: DataTypes.DECIMAL,
-    originalPrice: DataTypes.DECIMAL,
-    category: DataTypes.STRING,
+    price: {
+      type: DataTypes.DECIMAL(10, 2), // e.g., 10 digits total, 2 after decimal
+      allowNull: false,
+    },
+    originalPrice: DataTypes.DECIMAL(10, 2),
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     subcategory: DataTypes.STRING,
     imageUrl: DataTypes.STRING,
-    rating: DataTypes.FLOAT,
+    rating: DataTypes.FLOAT, // Or DataTypes.DECIMAL(2,1) for more control
     reviews: DataTypes.INTEGER,
-    stock: DataTypes.INTEGER,
-    colors: DataTypes.JSON,
-    sizes: DataTypes.JSON,
-    isFeatured: DataTypes.BOOLEAN,
-    dateAdded: DataTypes.DATE
+    colors: DataTypes.JSON, // Stores array of objects or strings
+    sizes: DataTypes.JSON,  // Stores array of strings
+    stock: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false,
+    },
+    isFeatured: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false,
+    }
   }, {
     sequelize,
     modelName: 'Product',
