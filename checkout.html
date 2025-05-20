@@ -191,7 +191,7 @@
                         <div class="payment-option">
                              <input name="paymentMethod" type="radio" id="mpesa" value="mpesa" checked>
                              <label for="mpesa">
-                                 <img src="./assets/icons/mpesa_logo.png" alt="M-Pesa" height="25" class="me-2"> M-Pesa Express (STK Push)
+                                 <img src="./assets/icons/mpesa_logo.png" alt="M-Pesa" height="25" class="me-2"> Lipa na M-Pesa
                              </label>
                              <div class="payment-details" id="mpesaDetails">
                                  <p><small>Enter your M-Pesa registered phone number. You will receive a prompt on your phone to enter your M-Pesa PIN to complete the payment.</small></p>
@@ -201,33 +201,7 @@
                              </div>
                         </div>
 
-                        <!-- Card Option -->
-                        <div class="payment-option">
-                             <input name="paymentMethod" type="radio" id="card" value="card">
-                             <label for="card">
-                                 <i class="fab fa-cc-visa me-1"></i> <i class="fab fa-cc-mastercard me-2"></i> Credit/Debit Card
-                             </label>
-                             <div class="payment-details" id="cardDetails" style="display: none;">
-                                 <p><small>Enter your card details below. Secured by <strong>Your Payment Provider (e.g., Stripe)</strong>.</small></p>
-                                 <!-- Stripe Elements will mount here -->
-                                 <div id="card-element" class="mb-3"></div>
-                                 <!-- Used to display form errors -->
-                                 <div id="card-errors" role="alert" class="text-danger small"></div>
-                             </div>
-                        </div>
-
-                        <!-- PayPal Option -->
-                         <div class="payment-option">
-                             <input name="paymentMethod" type="radio" id="paypal" value="paypal">
-                             <label for="paypal">
-                                 <i class="fab fa-paypal me-2"></i> PayPal
-                             </label>
-                             <div class="payment-details" id="paypalDetails" style="display: none;">
-                                 <p><small>You will be redirected to PayPal to complete your purchase securely.</small></p>
-                                 <!-- PayPal button will render here -->
-                                 <div id="paypal-button-container" class="mt-3"></div>
-                             </div>
-                         </div>
+                                               
                     </div>
 
                     <hr class="my-4">
@@ -368,12 +342,8 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Payment Gateway SDKs - Load these *before* your checkout.js -->
-    <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_SANDBOX_CLIENT_ID¤cy=KES"></script> <!-- Replace with your actual Sandbox Client ID -->
-
+    
+    
     <script src="./main.js"></script> <!-- For getCart, updateCartBadge -->
     <script src="./checkout.js"></script> <!-- Specific checkout logic -->
 
