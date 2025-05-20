@@ -779,4 +779,8 @@ display: none;
                 margin-bottom: 30px;
             }
         }
+
+        .fa-solid, .fas{
+            margin-right: 5px;
+        }
     
