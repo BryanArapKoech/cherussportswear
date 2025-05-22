@@ -24,7 +24,7 @@ async function getProductPrice(productId) {
 exports.createOrder = async (req, res, next) => {
     const { cart, shipping, paymentMethod, mpesaPhone } = req.body;
 
-    // --- Basic Input Validation ---
+    // --- Input Validation ---
     if (!cart || !Array.isArray(cart) || cart.length === 0) {
         return res.status(400).json({ message: 'Cart is empty or invalid.' });
     }
@@ -35,13 +35,15 @@ exports.createOrder = async (req, res, next) => {
         return res.status(400).json({ message: 'Shipping phone number is required.' });
     }
     if (paymentMethod !== 'mpesa') {
-         // We are only handling mpesa for now
+         
          return res.status(400).json({ message: 'Unsupported payment method.' });
     }
      if (!mpesaPhone || !/^\+?254\d{9}$/.test(mpesaPhone.trim())) {
-         return res.status(400).json({ message: 'Valid Kenyan M-Pesa phone number is required for payment (+254xxxxxxxxx).' });
+        transaction.rollback(); // Rollback if already started and mpesaPhone is invalid
+
+         return res.status(400).json({ message: 'Valid Kenyan M-Pesa phone number is required for payment (Expected +254xxxxxxxxx or or +2541XXXXXXXX).).' });
      }
-    // Add more validation for required shipping fields as needed
+    
 
     const transaction = await sequelize.transaction(); // Start DB transaction
 
@@ -94,10 +96,11 @@ exports.createOrder = async (req, res, next) => {
         console.log(`Order ${newOrder.id} created in DB with total: ${calculatedTotal}`);
 
         // --- Initiate M-Pesa STK Push ---
-        console.log(`Initiating STK for Order ${newOrder.id}, Amount: ${calculatedTotal}, Phone: ${mpesaPhone}`);
+        if (paymentMethod === 'mpesa') {
+            console.log(`Initiating STK for Order ${newOrder.id}, Amount: ${calculatedTotal}, Phone: ${mpesaPhone}`);
         const stkResult = await mpesaService.initiateSTKPush({
             amount: calculatedTotal,
-            phoneNumber: mpesaPhone.trim(), // Use the dedicated M-Pesa phone
+            phoneNumber: mpesaPhone.trim(),
             orderId: newOrder.id // Pass the DB Order ID as AccountReference
         });
 
@@ -133,9 +136,9 @@ exports.createOrder = async (req, res, next) => {
             mpesaCheckoutRequestId: stkResult.checkoutRequestID // Send this back
         });
 
-    } catch (error) {
-        await transaction.rollback(); // Rollback DB changes on any error
-        console.error('Error creating order:', error);
-        next(error); // Pass to error handling middleware
-    }
-};
+    }  } catch (error) {
+    await transaction.rollback(); // Rollback DB changes on error
+    console.error('Error creating order:', error);
+    next(error); // Pass to error-handling middleware
+  }
+}; // 

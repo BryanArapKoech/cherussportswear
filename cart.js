@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cartTotalElement = document.getElementById('cartTotal');
     const checkoutButton = document.getElementById('checkoutButton');
 
-    // Ensure main.js functions are available (getCart, saveCart, updateCartBadge, formatPrice)
+   
     if (typeof getCart !== 'function' || typeof saveCart !== 'function' || typeof updateCartBadge !== 'function' || typeof formatPrice !== 'function') {
         console.error("Core functions (getCart, saveCart, updateCartBadge, formatPrice) not found. Ensure main.js is loaded before cart.js and provides these.");
         if(cartItemsContainer) cartItemsContainer.innerHTML = '<div class="alert alert-danger">Error loading cart functionality. Please refresh.</div>';
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cartShippingElement.textContent = formatPrice(0); // Or "N/A"
             cartTotalElement.textContent = formatPrice(0);
             checkoutButton.classList.add('disabled');
-            updateCartBadge(); // Ensure badge is correctly hidden or 0
+            updateCartBadge(); //
             return;
         }
 

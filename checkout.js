@@ -3,11 +3,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('checkoutForm');
     const placeOrderBtn = document.getElementById('placeOrderBtn');
     const placeOrderBtnSpinner = placeOrderBtn.querySelector('.spinner-border');
+    const placeOrderBtnText = placeOrderBtn.querySelector('span:not(.spinner-border)');
     const paymentOptionsDiv = document.getElementById('paymentOptions');
     const mpesaDetailsDiv = document.getElementById('mpesaDetails');
+    // References to card and paypal details divs are kept to hide/show them,
+    // but their specific JS logic is removed.
     const cardDetailsDiv = document.getElementById('cardDetails');
     const paypalDetailsDiv = document.getElementById('paypalDetails');
-    const mpesaPhoneInput = document.getElementById('mpesaPhone');
+    const mpesaPhoneInput = document.getElementById('mpesaPhone'); // This is the 9-digit part
     const paymentErrorDiv = document.getElementById('paymentError');
 
     // Summary Elements
@@ -17,192 +20,135 @@ document.addEventListener('DOMContentLoaded', function() {
     const summaryShippingEl = document.getElementById('summaryShipping');
     const summaryTotalEl = document.getElementById('summaryTotal');
 
-    // --- Configuration (Replace with your actual keys/URLs) ---
-    const STRIPE_PUBLISHABLE_KEY = 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY'; // Replace with your Stripe Test Key
-    const BACKEND_URL = 'http://localhost:3000'; // Example URL for your backend server
-
-    // --- Initialize Stripe ---
-    let stripe, cardElement;
-    try {
-        stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-        const elements = stripe.elements();
-        const style = { // Optional: Style the Stripe Element
-            base: {
-                fontSize: '16px',
-                color: '#32325d',
-                '::placeholder': { color: '#aab7c4' }
-            },
-            invalid: { color: '#fa755a', iconColor: '#fa755a' }
-        };
-        cardElement = elements.create('card', { style: style });
-        cardElement.mount('#card-element'); // Mount Stripe element to the div
-
-        // Handle real-time validation errors from the card Element.
-        cardElement.on('change', function(event) {
-            const displayError = document.getElementById('card-errors');
-            if (event.error) {
-                displayError.textContent = event.error.message;
-            } else {
-                displayError.textContent = '';
-            }
-        });
-    } catch (error) {
-        console.error("Error initializing Stripe:", error);
-        // Handle error, maybe disable card payment option
-        const cardOption = document.getElementById('card');
-        if(cardOption) cardOption.disabled = true;
-        const cardLabel = document.querySelector('label[for="card"]');
-         if(cardLabel) cardLabel.innerHTML += ' <span class="text-danger small">(Unavailable)</span>';
-    }
-
-    // --- Initialize PayPal ---
-    function initializePayPalButtons(totalAmount) {
-         if (typeof paypal === 'undefined') {
-             console.error("PayPal SDK not loaded");
-             return;
-         }
-        // Clear previous buttons if re-initializing
-         document.getElementById('paypal-button-container').innerHTML = '';
-
-         paypal.Buttons({
-             createOrder: function(data, actions) {
-                 console.log("Creating PayPal order for amount:", totalAmount);
-                 // **BACKEND CALL:** Ideally, call your backend here to create the PayPal order
-                 // and return the order ID. The backend keeps the transaction secure.
-                 // return fetch(`${BACKEND_URL}/api/paypal/create-order`, {
-                 //    method: 'POST',
-                 //    headers: { 'Content-Type': 'application/json' },
-                 //    body: JSON.stringify({ cart: getCart(), total: totalAmount }) // Send cart/total
-                 // })
-                 // .then(res => res.json())
-                 // .then(data => data.orderID); // Your backend returns the ID
-
-                 // **Frontend Simulation (Insecure for Production):**
-                 return actions.order.create({
-                     purchase_units: [{
-                         amount: {
-                             value: totalAmount.toFixed(2), // Use the calculated total
-                             currency_code: 'KES'
-                         }
-                     }]
-                 });
-             },
-             onApprove: function(data, actions) {
-                 console.log("PayPal order approved:", data);
-                 // **BACKEND CALL:** Call your backend to capture/finalize the payment.
-                 // Send data.orderID to your backend for verification and order completion.
-                 // return fetch(`${BACKEND_URL}/api/paypal/capture-order`, {
-                 //    method: 'POST',
-                 //    headers: { 'Content-Type': 'application/json' },
-                 //    body: JSON.stringify({ orderID: data.orderID })
-                 // })
-                 // .then(res => res.json())
-                 // .then(orderData => {
-                 //      console.log('Capture result', orderData);
-                 //      handleServerResponse({ success: true, orderId: orderData.id /* or similar */ }); // Handle backend response
-                 // })
-                 // .catch(err => handlePaymentError("Failed to capture PayPal payment."));
-
-                 // **Frontend Simulation:**
-                 return actions.order.capture().then(function(details) {
-                     console.log('PayPal capture details:', details);
-                     // Simulate successful backend processing
-                     handleServerResponse({ success: true, orderId: details.id, paymentMethod: 'paypal' });
-                 });
-             },
-             onError: function(err) {
-                 console.error("PayPal Button Error:", err);
-                 handlePaymentError("An error occurred with PayPal.");
-             }
-         }).render('#paypal-button-container').catch(err => {
-             console.error("Failed to render PayPal buttons:", err);
-              handlePaymentError("Could not display PayPal option.");
-         });
-    }
-
+    // --- Configuration ---
+    const BACKEND_URL = 'http://localhost:3000';
 
     // --- Load Order Summary ---
     function loadOrderSummary() {
+        if (typeof getCart !== 'function') {
+            console.error("getCart function is not defined.");
+            if (summaryItemsList) summaryItemsList.innerHTML = '<li class="list-group-item">Error loading cart.</li>';
+            return;
+        }
         const cart = getCart();
-        summaryItemsList.innerHTML = ''; // Clear loading
+        if (!summaryItemsList || !summaryCartCount || !summarySubtotalEl || !summaryShippingEl || !summaryTotalEl) {
+            console.error("One or more summary elements are missing.");
+            return;
+        }
+
+        summaryItemsList.innerHTML = '';
         let subtotal = 0;
+        let itemCount = 0;
 
         if (cart.length === 0) {
-            // Redirect back to cart or show message if cart is empty on checkout
             window.location.href = 'cart.html';
             return;
         }
 
         cart.forEach(item => {
-            subtotal += item.price * item.quantity;
+            const itemPrice = parseFloat(item.price) || 0;
+            const itemQuantity = parseInt(item.quantity) || 0;
+            subtotal += itemPrice * itemQuantity;
+            itemCount += itemQuantity;
+
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'lh-sm');
             li.innerHTML = `
                 <div>
-                    <h6 class="my-0">${item.name} <span class="text-muted">(${item.quantity})</span></h6>
-                    <small class="text-muted">${item.size ? `Size: ${item.size}` : ''} ${item.color ? `Color: ${item.color}` : ''}</small>
+                    <h6 class="my-0">${item.name} <span class="text-muted">(${itemQuantity})</span></h6>
+                    <small class="text-muted">${item.size && item.size !== 'NA' ? `Size: ${item.size}` : ''} ${item.color && item.color !== 'NA' ? `Color: ${item.color}` : ''}</small>
                 </div>
-                <span class="text-muted">${formatPrice(item.price * item.quantity)}</span>
+                <span class="text-muted">${formatPrice(itemPrice * itemQuantity)}</span>
             `;
             summaryItemsList.appendChild(li);
         });
 
-        // Example: Fixed shipping cost
-        const shippingCost = 200.00;
+        const shippingCost = 200.00; // Example fixed shipping
         const total = subtotal + shippingCost;
 
-        summaryCartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        summaryCartCount.textContent = itemCount;
         summarySubtotalEl.textContent = formatPrice(subtotal);
         summaryShippingEl.textContent = formatPrice(shippingCost);
         summaryTotalEl.textContent = formatPrice(total);
+    }
 
-        // Initialize/Update PayPal buttons with the correct total
-        initializePayPalButtons(total);
+    // --- Helper function to get combined M-Pesa number ---
+    function getMpesaPhoneNumber() {
+        if (mpesaPhoneInput && mpesaPhoneInput.value) {
+            return `+254${mpesaPhoneInput.value.trim()}`;
+        }
+        return null;
     }
 
     // --- Payment Method Display Logic ---
-    paymentOptionsDiv.addEventListener('change', (event) => {
-        if (event.target.name === 'paymentMethod') {
-            mpesaDetailsDiv.style.display = event.target.value === 'mpesa' ? 'block' : 'none';
-            cardDetailsDiv.style.display = event.target.value === 'card' ? 'block' : 'none';
-            paypalDetailsDiv.style.display = event.target.value === 'paypal' ? 'block' : 'none';
-
-            // Set required attribute for M-Pesa phone only when visible
-            mpesaPhoneInput.required = (event.target.value === 'mpesa');
+    function setupPaymentMethodToggle() {
+        if (!paymentOptionsDiv || !mpesaDetailsDiv || !cardDetailsDiv || !paypalDetailsDiv || !mpesaPhoneInput) {
+            console.warn("One or more payment option elements are missing in setupPaymentMethodToggle.");
+            return;
         }
-    });
+        paymentOptionsDiv.addEventListener('change', (event) => {
+            if (event.target.name === 'paymentMethod') {
+                const selectedValue = event.target.value;
+                mpesaDetailsDiv.style.display = selectedValue === 'mpesa' ? 'block' : 'none';
+                // Still hide/show these divs even if their JS logic is removed
+                cardDetailsDiv.style.display = selectedValue === 'card' ? 'block' : 'none';
+                paypalDetailsDiv.style.display = selectedValue === 'paypal' ? 'block' : 'none';
+
+                mpesaPhoneInput.required = (selectedValue === 'mpesa');
+                hidePaymentError();
+            }
+        });
+        const initialPaymentMethod = paymentOptionsDiv.querySelector('input[name="paymentMethod"]:checked');
+        if (initialPaymentMethod) {
+            initialPaymentMethod.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
 
     // --- Form Submission ---
-    form.addEventListener('submit', async (event) => {
+    async function handleFormSubmit(event) {
         event.preventDefault();
-        // Basic Bootstrap validation
+        hidePaymentError();
+
         if (!form.checkValidity()) {
             event.stopPropagation();
             form.classList.add('was-validated');
+            const firstInvalid = form.querySelector(':invalid');
+            firstInvalid?.focus();
+            firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
-        form.classList.add('was-validated'); // Show validation styles even if initially valid
+        form.classList.add('was-validated');
 
-        setLoading(true); // Show spinner, disable button
-        hidePaymentError();
-
-        const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+        const selectedPaymentMethod = form.elements.paymentMethod.value;
         const cart = getCart();
-        const shippingDetails = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            email: document.getElementById('email').value,
-            phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
-            address2: document.getElementById('address2').value,
-            city: document.getElementById('city').value,
-            county: document.getElementById('county').value,
-            zip: document.getElementById('zip').value,
-        };
+        const shippingDetails = getCustomerDetails();
+        let mpesaFullPhoneNumber = null;
 
-        console.log("Placing order with method:", selectedPaymentMethod);
+        if (selectedPaymentMethod !== 'mpesa') {
+            handlePaymentError("Only M-Pesa payment is currently supported. Please select M-Pesa.");
+            // Optionally, you could re-select M-Pesa radio button
+            const mpesaRadio = document.getElementById('mpesa');
+            if(mpesaRadio) mpesaRadio.checked = true;
+            // And trigger the change event to update UI
+            const changeEvent = new Event('change', { bubbles: true });
+            paymentOptionsDiv.dispatchEvent(changeEvent);
+            return;
+        }
 
-        // ** THIS IS WHERE BACKEND INTEGRATION HAPPENS **
+        // This block now only executes if M-Pesa is selected
+        mpesaFullPhoneNumber = getMpesaPhoneNumber();
+        if (!mpesaFullPhoneNumber || !/^\+254[17]\d{8}$/.test(mpesaFullPhoneNumber)) {
+            handlePaymentError("Please enter a valid M-Pesa number (9 digits after +254, starting with 1 or 7).");
+            if (mpesaPhoneInput) {
+                mpesaPhoneInput.classList.add('is-invalid');
+                mpesaPhoneInput.focus();
+            }
+            return;
+        }
+
+        setLoading(true);
+        console.log("Placing order with M-Pesa. Phone:", mpesaFullPhoneNumber);
+
         try {
             const response = await fetch(`${BACKEND_URL}/api/create-order`, {
                 method: 'POST',
@@ -210,150 +156,116 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     cart: cart,
                     shipping: shippingDetails,
-                    paymentMethod: selectedPaymentMethod,
-                    mpesaPhone: selectedPaymentMethod === 'mpesa' ? mpesaPhoneInput.value : null
+                    paymentMethod: selectedPaymentMethod, // Will be 'mpesa'
+                    mpesaPhone: mpesaFullPhoneNumber
                 })
             });
 
             const orderData = await response.json();
 
             if (!response.ok) {
-                throw new Error(orderData.message || 'Failed to create order');
+                throw new Error(orderData.message || `Failed to create order (Status: ${response.status})`);
             }
+            console.log("Order created on backend for M-Pesa:", orderData);
 
-            // Backend should return necessary info based on payment method
-            // e.g., { success: true, orderId: '123', clientSecret: 'pi_xxx_secret_xxx' } for Stripe
-            // e.g., { success: true, orderId: '123', mpesaCheckoutRequestId: 'ws_CO_xxx' } for M-Pesa
-
-            console.log("Order created on backend:", orderData);
-
-            // --- Handle Payment Based on Method ---
-            if (selectedPaymentMethod === 'card' && orderData.clientSecret) {
-                 // Use Stripe.js to confirm the card payment
-                 const { paymentIntent, error } = await stripe.confirmCardPayment(
-                     orderData.clientSecret, // The PaymentIntent client secret from your backend
-                     {
-                         payment_method: {
-                             card: cardElement,
-                             billing_details: {
-                                 name: `${shippingDetails.firstName} ${shippingDetails.lastName}`,
-                                 email: shippingDetails.email,
-                                 phone: shippingDetails.phone,
-                                 address: { // Optional but recommended
-                                     line1: shippingDetails.address,
-                                     line2: shippingDetails.address2,
-                                     city: shippingDetails.city,
-                                     state: shippingDetails.county, // Assuming county maps to state
-                                     postal_code: shippingDetails.zip,
-                                     country: 'KE', // Assuming Kenya
-                                 },
-                             },
-                         },
-                     }
-                 );
-
-                 if (error) {
-                     console.error("Stripe card confirmation error:", error);
-                     handlePaymentError(error.message || "Card payment failed. Please try again.");
-                     setLoading(false);
-                 } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                     console.log("Stripe PaymentIntent successful:", paymentIntent);
-                     // **BACKEND CALL (Optional but good):** Notify backend payment is complete
-                     // fetch(`${BACKEND_URL}/api/confirm-order/${orderData.orderId}`, { method: 'POST' });
-                     handleServerResponse({ success: true, orderId: orderData.orderId, paymentMethod: 'card' });
-                 } else {
-                      console.warn("Stripe payment status:", paymentIntent ? paymentIntent.status : 'unknown');
-                      handlePaymentError("Payment processing. We'll confirm via email or contact support.");
-                      setLoading(false); // Keep user informed
-                 }
-
-            } else if (selectedPaymentMethod === 'mpesa') {
-                // M-Pesa STK push was likely initiated by the backend during /api/create-order
-                console.log("M-Pesa STK Push initiated. CheckoutRequestID:", orderData.mpesaCheckoutRequestId);
-                // Show message to user: "Please check your phone to enter your M-Pesa PIN..."
-                // You might poll your backend to check the M-Pesa transaction status or rely on webhooks
-                 // For simulation, we'll just proceed to success page after a delay
-                 showToast("Please check your phone and enter your M-Pesa PIN."); // Use your existing toast function
-                 setTimeout(() => {
-                     // In reality, you wait for backend confirmation (webhook/polling)
-                     handleServerResponse({ success: true, orderId: orderData.orderId, paymentMethod: 'mpesa' });
-                 }, 10000); // Simulate 10 second wait for user PIN input
-
-            } else if (selectedPaymentMethod === 'paypal') {
-                // PayPal flow is handled by the SDK's onApprove function.
-                // The fetch calls inside initializePayPalButtons handle backend interaction.
-                // If we reach here for PayPal, it means the user clicked "Place Order" *before* completing
-                // the PayPal popup, which shouldn't ideally happen if the button is inside the form.
-                // Or, if PayPal button is separate, this logic might not be needed here.
-                 console.log("Proceeding with PayPal - user will complete via popup.");
-                 // No immediate action needed here, SDK handles it. Button click triggered SDK.
-                 // setLoading(false); // Allow user to interact with PayPal popup
-
-            } else {
-                // Handle other payment methods or unexpected scenarios
-                 handlePaymentError("Selected payment method not fully configured.");
-                 setLoading(false);
-            }
+            // M-Pesa STK push was initiated by the backend.
+            console.log("M-Pesa STK Push initiated. CheckoutRequestID:", orderData.mpesaCheckoutRequestId);
+            handlePaymentError("Please check your phone and enter your M-Pesa PIN to authorize the payment. We will confirm once payment is received.");
+            // User remains on the checkout page. setLoading(true) remains active.
+            // No direct call to handleServerResponse for M-Pesa success here.
 
         } catch (error) {
-            console.error("Checkout Error:", error);
+            console.error("Checkout Processing Error:", error);
             handlePaymentError(error.message || "An error occurred during checkout. Please try again.");
-            setLoading(false);
+            setLoading(false); // Reset loading on error
         }
-    });
+    }
 
-    // --- Helper Functions ---
+    // --- Helper Functions (common) ---
     function formatPrice(price) {
-        return `Kshs. ${price.toFixed(2)}`;
+        return `Kshs. ${Number(price).toFixed(2)}`;
+    }
+
+    function getCustomerDetails() {
+        return {
+            firstName: document.getElementById('firstName')?.value || '',
+            lastName: document.getElementById('lastName')?.value || '',
+            email: document.getElementById('email')?.value || '',
+            phone: document.getElementById('phone')?.value || '',
+            address: document.getElementById('address')?.value || '',
+            address2: document.getElementById('address2')?.value || '',
+            city: document.getElementById('city')?.value || '',
+            county: document.getElementById('county')?.value || '',
+            zip: document.getElementById('zip')?.value || '',
+        };
     }
 
     function setLoading(isLoading) {
+        if (!placeOrderBtn || !placeOrderBtnSpinner || !placeOrderBtnText) return;
         if (isLoading) {
             placeOrderBtn.disabled = true;
             placeOrderBtnSpinner.style.display = 'inline-block';
-            placeOrderBtn.querySelector('span:not(.spinner-border)').textContent = ' Processing...'; // Change text
+            placeOrderBtnText.textContent = 'Processing...';
         } else {
             placeOrderBtn.disabled = false;
             placeOrderBtnSpinner.style.display = 'none';
-            placeOrderBtn.querySelector('span:not(.spinner-border)').textContent = 'Place Order'; // Restore text
+            placeOrderBtnText.textContent = 'Place Order';
         }
     }
 
     function handlePaymentError(message) {
+        if (!paymentErrorDiv) return;
         paymentErrorDiv.textContent = message;
         paymentErrorDiv.style.display = 'block';
-        window.scrollTo(0, document.body.scrollHeight); // Scroll to show error
-    }
-    function hidePaymentError() {
-        paymentErrorDiv.style.display = 'none';
+        paymentErrorDiv.focus();
+        paymentErrorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
+    function hidePaymentError() {
+        if (paymentErrorDiv) paymentErrorDiv.style.display = 'none';
+    }
+
+    // handleServerResponse would be called by other payment methods upon *immediate frontend confirmation*
+    // For M-Pesa, this is typically NOT called directly from the STK push initiation response,
+    // but rather after a webhook or polling confirms the payment.
+    // However, it's kept here if you re-enable Card/PayPal which might use it.
     function handleServerResponse(data) {
-         console.log("Handling server response:", data);
+        console.log("Handling server response (e.g., for Card/PayPal immediate success):", data);
         if (data.success) {
-            // Payment successful!
-            clearCart(); // Clear localStorage cart
-            updateCartBadge(); // Update header badge (should show 0)
-            // Redirect to a thank you page, passing order ID
-            window.location.href = `thank-you.html?orderId=${data.orderId}&method=${data.paymentMethod}`;
+            if (typeof clearCart === 'function') clearCart();
+            if (typeof updateCartBadge === 'function') updateCartBadge();
+
+            const thankYouUrl = new URL('thank-you.html', window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/');
+            thankYouUrl.searchParams.set('orderId', data.orderId);
+            thankYouUrl.searchParams.set('method', data.paymentMethod);
+            if (data.email) {
+                thankYouUrl.searchParams.set('email', encodeURIComponent(data.email));
+            }
+            window.location.href = thankYouUrl.toString();
         } else {
-            // Handle payment failure specific message if available
-            handlePaymentError(data.message || "Payment failed. Please check your details or try another method.");
+            handlePaymentError(data.message || "Payment processing failed. Please check your details or try another method.");
             setLoading(false);
         }
     }
 
-     function clearCart() {
-        localStorage.removeItem('shoppingCart');
+    // Stubs for functions presumed to be in main.js
+    if (typeof getCart === 'undefined') {
+        window.getCart = function() { console.warn("Used stubbed getCart"); return []; };
+    }
+    if (typeof clearCart === 'undefined') {
+        window.clearCart = function() { localStorage.removeItem('shoppingCart'); console.warn("Used stubbed clearCart"); };
+    }
+    if (typeof updateCartBadge === 'undefined') {
+        window.updateCartBadge = function() { console.warn("Used stubbed updateCartBadge"); };
     }
 
     // --- Initial Load ---
-    loadOrderSummary();
-    // Trigger change event manually to show/hide initial payment details section
-    const initialPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
-    if(initialPaymentMethod) {
-        initialPaymentMethod.dispatchEvent(new Event('change', { bubbles: true }));
+    if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+        loadOrderSummary();
+        setupPaymentMethodToggle();
+    } else {
+        console.error("Checkout form with ID 'checkoutForm' not found.");
     }
-    updateCartBadge(); // Update header badge on checkout load
-
+    if (typeof updateCartBadge === 'function') updateCartBadge();
 });

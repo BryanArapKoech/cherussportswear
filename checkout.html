@@ -7,125 +7,99 @@
     <link rel="stylesheet" href="./styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Add specific checkout styles if needed -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css"> <!-- Added Remixicon for header -->
     <style>
         .order-summary-box { border: 1px solid #eee; padding: 20px; border-radius: 5px; background-color: #f9f9f9; }
         .payment-option label { display: block; padding: 15px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; cursor: pointer; }
         .payment-option input[type="radio"]:checked + label { border-color: #ffc107; background-color: #fffcf1; }
         .payment-option input[type="radio"] { display: none; } /* Hide radio button */
         .payment-details { margin-top: 15px; padding: 15px; border: 1px solid #eee; border-radius: 4px; }
-        #card-element { border: 1px solid #ccc; padding: 10px; border-radius: 4px; } /* For Stripe */
+       
     </style>
 </head>
 <body>
 
     <!-- Header -->
     <header>
-        
         <!-- Top Navbar -->
-   <div class="top-navbar">
-       <div class="top-navbar__content">
-           <section class="logo">
-               <a href="index.html" class="nav__logo"> <!-- Point home link to index.html -->
-                   <img src="./assets/favicon.svg" alt="logo" class="logo__img">
-                   <span class="logo__text">Cherus Sportswear</span>
-               </a>
-           </section>
-           <section class="search">
-               <form action="https://www.google.com/search" method="get" class="search_bar">
-                   <input type="text" placeholder="Search for any product..." name="q"> <!-- 'q' for Google Search -->
-                   <button type="submit"><img src="./assets/icons/searchblack.svg" width="25" height="25" alt="search_icon"></button>
-               </form>
-           </section>
-           <div class="hamburger" id="hamburger-menu">
-               <div class="bar"></div>
-               <div class="bar"></div>
-               <div class="bar"></div>
+       <div class="top-navbar">
+           <div class="top-navbar__content">
+               <section class="logo">
+                   <a href="index.html" class="nav__logo">
+                       <img src="./assets/favicon.svg" alt="logo" class="logo__img">
+                       <span class="logo__text">Cherus Sportswear</span>
+                   </a>
+               </section>
+               <section class="search">
+                   <form action="https://www.google.com/search" method="get" class="search_bar">
+                       <input type="text" placeholder="Search for any product..." name="q">
+                       <button type="submit"><img src="./assets/icons/searchblack.svg" width="25" height="25" alt="search_icon"></button>
+                   </form>
+               </section>
+               <div class="hamburger" id="hamburger-menu">
+                   <div class="bar"></div>
+                   <div class="bar"></div>
+                   <div class="bar"></div>
+               </div>
+               <section class="phone">
+                   <i class="fa-solid fa-phone icon"></i>
+                   +254(721)370738
+               </section>
            </div>
-           <section class="phone">
-               <i class="fa-solid fa-phone icon"></i>
-               +254(721)370738
-           </section>
        </div>
-   </div>
-
-   <!-- Bottom Navbar -->
-   <div class="bottom-navbar">
-       <div class="bottom-navbar__content">
-           <nav class="nav-container">
-               <div class="nav__menu" id="nav-menu">
-                   <ul class="nav__list">
-                       <li><a href="index.html" class="nav__link">Home</a></li>
-
-                       <!-- About Us Dropdown -->
-                       <li class="dropdown__item">
-                           <div class="nav__link">
-                               About Us <i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                           </div>
-                           <ul class="dropdown__menu">
-                               <li>
-                                   <a href="about.html#mission" class="dropdown__link"> <!--  Link to specific sections  -->
-                                       <i class="ri-user-line"></i> Our Mission
-                                   </a>
-                               </li>
-                               <li>
-                                   <a href="about.html#vision" class="dropdown__link">
-                                       <i class="ri-lock-line"></i> Our Vision
-                                   </a>
-                               </li>
-                           </ul>
-                       </li>
-
-                       <!-- Shop Dropdown -->
-                       <li class="dropdown__item">
-                            <div class="nav__link"> <!--  link to the main shop page -->
-                               Shop <i class="ri-arrow-down-s-line dropdown__arrow"></i>
-                           </div>
-                           <ul class="dropdown__menu">
-                               <li><a href="index.html?category=shoes" class="dropdown__link" data-category="shoes">Shoes</a></li>
-                               <li><a href="index.html?category=fullsuit" class="dropdown__link" data-category="fullsuit">Fullsuit</a></li>
-                               <li><a href="index.html?category=vests" class="dropdown__link" data-category="vests">Vests</a></li>
-                               
-                               <!-- Equipment Submenu -->
-                               <li class="dropdown__subitem">
-                                   <div class="dropdown__link"> 
-                                       Equipment <i class="ri-add-line dropdown__add"></i>
-                                   </div>
-                                   <ul class="dropdown__submenu">
-                                       <li><a href="index.html?category=equipment&subcategory=balls" class="dropdown__sublink" data-category="equipment" data-subcategory="balls">Balls</a></li>
-                                       <li><a href="index.html?category=equipment&subcategory=nets" class="dropdown__sublink" data-category="equipment" data-subcategory="nets">Nets</a></li>
-                                       <li><a href="index.html?category=equipment&subcategory=bags" class="dropdown__sublink" data-category="equipment" data-subcategory="bags">Bags</a></li>
-                                       <li><a href="index.html?category=equipment&subcategory=cones" class="dropdown__sublink" data-category="equipment" data-subcategory="cones">Cones</a></li>
-                                       <li><a href="index.html?category=equipment&subcategory=ankle-support" class="dropdown__sublink" data-category="equipment" data-subcategory="ankle-support">Ankle support</a></li>
-                                       <li><a href="index.html?category=equipment&subcategory=sleeve" class="dropdown__sublink" data-category="equipment" data-subcategory="sleeve">Sleeve</a></li>
-                                   </ul>
-                               </li>
-                               <li><a href="index.html?category=gloves" class="dropdown__link" data-category="gloves">Gloves</a></li>
-                               <li><a href="index.html?category=jackets" class="dropdown__link" data-category="jackets">Jackets</a></li>
-                               <li><a href="index.html?category=caps" class="dropdown__link" data-category="caps">Caps</a></li>
-                               <li><a href="index.html?category=shorts" class="dropdown__link" data-category="shorts">Shorts</a></li>
-                               <li><a href="index.html?category=t-shirts" class="dropdown__link" data-category="t-shirts">T-shirts</a></li>
-                               <li><a href="index.html?category=socks" class="dropdown__link" data-category="socks">Socks</a></li>
-                           </ul>
-                       </li>
-
-                       
-                       <li><a href="./login.html" class="btn">Login</a></li>
-                       <li><a href="./wishlist.html" class="nav__link"><i class="fas fa-heart"></i> Wishlist</a></li>
-        <li>
-            <a href="cart.html" class="nav__link">
-                <i class="fas fa-shopping-bag"></i> My Bag
-                <span class="badge rounded-pill bg-danger cart-badge" id="cartItemCountBadge" 
-                style="display: none; vertical-align: top; margin-left: 4px;">0
-               </span>
-            </a>
-        </li>
-       </ul>
-   </div>
-</nav>
-</div>
-</div>
-   </header>
+       <!-- Bottom Navbar -->
+       <div class="bottom-navbar">
+           <div class="bottom-navbar__content">
+               <nav class="nav-container">
+                   <div class="nav__menu" id="nav-menu">
+                       <ul class="nav__list">
+                           <li><a href="index.html" class="nav__link">Home</a></li>
+                           <li class="dropdown__item">
+                               <div class="nav__link">About Us <i class="ri-arrow-down-s-line dropdown__arrow"></i></div>
+                               <ul class="dropdown__menu">
+                                   <li><a href="about.html#mission" class="dropdown__link"><i class="ri-user-line"></i> Our Mission</a></li>
+                                   <li><a href="about.html#vision" class="dropdown__link"><i class="ri-lock-line"></i> Our Vision</a></li>
+                               </ul>
+                           </li>
+                           <li class="dropdown__item">
+                                <div class="nav__link">Shop <i class="ri-arrow-down-s-line dropdown__arrow"></i></div>
+                                <ul class="dropdown__menu">
+                                    <li><a href="index.html?category=shoes" class="dropdown__link">Shoes</a></li>
+                                    <li><a href="index.html?category=fullsuit" class="dropdown__link">Fullsuit</a></li>
+                                    <li><a href="index.html?category=vests" class="dropdown__link">Vests</a></li>
+                                    <li class="dropdown__subitem">
+                                        <div class="dropdown__link">Equipment <i class="ri-add-line dropdown__add"></i></div>
+                                        <ul class="dropdown__submenu">
+                                            <li><a href="index.html?category=equipment&subcategory=balls" class="dropdown__sublink">Balls</a></li>
+                                            <li><a href="index.html?category=equipment&subcategory=nets" class="dropdown__sublink">Nets</a></li>
+                                            <li><a href="index.html?category=equipment&subcategory=bags" class="dropdown__sublink">Bags</a></li>
+                                            <li><a href="index.html?category=equipment&subcategory=cones" class="dropdown__sublink">Cones</a></li>
+                                            <li><a href="index.html?category=equipment&subcategory=ankle-support" class="dropdown__sublink">Ankle support</a></li>
+                                            <li><a href="index.html?category=equipment&subcategory=sleeve" class="dropdown__sublink">Sleeve</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="index.html?category=gloves" class="dropdown__link">Gloves</a></li>
+                                    <li><a href="index.html?category=jackets" class="dropdown__link">Jackets</a></li>
+                                    <li><a href="index.html?category=caps" class="dropdown__link">Caps</a></li>
+                                    <li><a href="index.html?category=shorts" class="dropdown__link">Shorts</a></li>
+                                    <li><a href="index.html?category=t-shirts" class="dropdown__link">T-shirts</a></li>
+                                    <li><a href="index.html?category=socks" class="dropdown__link">Socks</a></li>
+                                </ul>
+                           </li>
+                           <li><a href="./login.html" class="btn">Login</a></li>
+                           <li><a href="./wishlist.html" class="nav__link"><i class="fas fa-heart"></i> Wishlist</a></li>
+                           <li>
+                               <a href="cart.html" class="nav__link">
+                                   <i class="fas fa-shopping-bag"></i> My Bag
+                                   <span class="badge rounded-pill bg-danger cart-badge" id="cartItemCountBadge" style="display: none; vertical-align: top; margin-left: 4px;">0</span>
+                               </a>
+                           </li>
+                       </ul>
+                   </div>
+               </nav>
+           </div>
+       </div>
+    </header>
 
     <main class="container my-5">
         <h1>Checkout</h1>
@@ -154,8 +128,8 @@
                         </div>
                         <div class="col-12">
                             <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone" placeholder="+2547XXXXXXXX" required>
-                            <div class="invalid-feedback">Please enter your phone number.</div>
+                            <input type="tel" class="form-control" id="phone" placeholder="+2547XXXXXXXX" required pattern="^\+254[17]\d{8}$" title="Phone number in +2547XXXXXXXX or +2541XXXXXXXX format.">
+                            <div class="invalid-feedback">Please enter your phone number (e.g. +254712345678).</div>
                         </div>
                         <div class="col-12">
                             <label for="address" class="form-label">Address</label>
@@ -187,28 +161,60 @@
                     <!-- Payment -->
                     <h4 class="mb-3">Payment Method</h4>
                     <div id="paymentOptions">
-                        <!-- M-Pesa Option -->
+                        <!-- M-Pesa Option (Only one visible for now) -->
                         <div class="payment-option">
-                             <input name="paymentMethod" type="radio" id="mpesa" value="mpesa" checked>
-                             <label for="mpesa">
-                                 <img src="./assets/icons/mpesa_logo.png" alt="M-Pesa" height="25" class="me-2"> Lipa na M-Pesa
+                             <!-- Radio button can be hidden if it's the only option, but good for structure -->
+                             <input name="paymentMethod" type="radio" id="mpesa" value="mpesa" checked style="display: none;">
+                             <label for="mpesa" style="border-color: #ffc107; background-color: #fffcf1;"> <!-- Apply active styles directly -->
+                                 <img src="./assets/M-PESA-logo.png" alt="M-Pesa" height="25" class="me-2"> Lipa na M-Pesa
                              </label>
-                             <div class="payment-details" id="mpesaDetails">
-                                 <p><small>Enter your M-Pesa registered phone number. You will receive a prompt on your phone to enter your M-Pesa PIN to complete the payment.</small></p>
+                             <div class="payment-details" id="mpesaDetails"> 
+                                 <p><small>Enter your M-Pesa registered phone number (the 9 digits after +254). You will receive a prompt on your phone to enter your M-Pesa PIN.</small></p>
                                  <label for="mpesaPhone" class="form-label">M-Pesa Phone Number</label>
-                                 <input type="tel" class="form-control" id="mpesaPhone" placeholder="+2547XXXXXXXX" required>
-                                 <div class="invalid-feedback">Valid M-Pesa phone number required.</div>
+                                 <div class="input-group mb-3">
+                                     <span class="input-group-text" id="mpesa-prefix">+254</span>
+                                     <input type="tel" class="form-control" id="mpesaPhone" placeholder="712345678"
+                                            aria-describedby="mpesa-prefix"
+                                            required
+                                            pattern="^[17]\d{8}$"
+                                            title="Enter the 9 digits of your M-Pesa number (e.g., 712345678 or 123456789)."
+                                            maxlength="9">
+                                     <div class="invalid-feedback" id="mpesaPhoneFeedback" style="width: 100%;">
+                                        Please enter the 9 digits of your M-Pesa number (e.g., 712345678 or 123456789).
+                                    </div>
+                                 </div>
                              </div>
                         </div>
-
-                                               
+                        <!-- Card Option - Hidden via style as per "M-Pesa only" focus -->
+                        <div class="payment-option" style="display: none;">
+                             <input name="paymentMethod" type="radio" id="card" value="card">
+                             <label for="card">
+                                 <i class="fab fa-cc-visa me-1"></i> <i class="fab fa-cc-mastercard me-2"></i> Credit/Debit Card
+                             </label>
+                             <div class="payment-details" id="cardDetails" style="display: none;">
+                                 <p><small>Enter your card details below.</small></p>
+                                 <div id="card-element" class="mb-3"></div>
+                                 <div id="card-errors" role="alert" class="text-danger small"></div>
+                             </div>
+                        </div>
+                        <!-- PayPal Option - Hidden via style -->
+                         <div class="payment-option" style="display: none;">
+                             <input name="paymentMethod" type="radio" id="paypal" value="paypal">
+                             <label for="paypal">
+                                 <i class="fab fa-paypal me-2"></i> PayPal
+                             </label>
+                             <div class="payment-details" id="paypalDetails" style="display: none;">
+                                 <p><small>You will be redirected to PayPal to complete your purchase securely.</small></p>
+                                 <div id="paypal-button-container" class="mt-3"></div>
+                             </div>
+                         </div>
                     </div>
 
                     <hr class="my-4">
 
                     <button class="w-100 btn btn-warning btn-lg" type="submit" id="placeOrderBtn">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                        Place Order
+                        <span class="button-text">Place Order</span> <!-- For easier text manipulation with JS -->
                     </button>
                      <div id="paymentError" class="text-danger mt-3" style="display: none;"></div>
 
@@ -222,11 +228,10 @@
                     <span class="badge bg-warning rounded-pill" id="summaryCartCount">0</span>
                 </h4>
                 <ul class="list-group mb-3" id="summaryItemsList">
-                    <!-- Summary items loaded by JS -->
-                    <li class="list-group-item d-flex justify-content-between lh-sm"><div>Loading...</div></li>
+                    <li class="list-group-item d-flex justify-content-between lh-sm"><div class="col-12 text-center"><span class="spinner-border spinner-border-sm"></span> Loading...</div></li>
                 </ul>
 
-                 <div class="order-summary-box">
+                 <div class="order-summary-box mt-4">
                     <h5 class="mb-3">Summary Totals</h5>
                      <div class="d-flex justify-content-between mb-2">
                         <span>Subtotal</span>
@@ -234,7 +239,7 @@
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Shipping Estimate</span>
-                         <span id="summaryShipping">Kshs. 200.00</span> <!-- Example fixed shipping -->
+                         <span id="summaryShipping">Kshs. 200.00</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between fw-bold h5">
@@ -248,104 +253,81 @@
 
     <!-- Footer -->
     <footer>
-        <!-- ... (your existing footer content) ... -->
          <div class="footer-container">
              <div class="footer-section">
                  <img src="./assets/favicon.svg" alt="Cherus sportswear logo" class="mb-2" width="100">
                  <p>Discover the best sportswear, <br> shoes and equipment <br> With Cherus Sportswear!</p>
              </div>
-             <!-- Contact Section -->
              <div class="footer-section">
                  <h3 class="footer-title">Contact</h3>
                  <div class="contact-links">
-                     <a href="#whatsapp">
-                         <img src="./assets/icons/whatsapp.svg" alt="whatsapp icon" width="20px" height="20px">
-                         WhatsApp
+                     <a href="https://wa.me/254721370738" target="_blank" rel="noopener noreferrer">
+                         <img src="./assets/icons/whatsapp.svg" alt="whatsapp icon" width="20px" height="20px"> WhatsApp
                      </a>
-                     <a href="#chat">
+                     <a href="#">
                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                         </svg>
-                         Chat
+                         </svg> Chat
                      </a>
-
-
                  </div>
-
              </div>
-
-             <!-- Social Media Links -->
              <div class="footer-section">
+                  <h3 class="footer-title">Follow Us</h3>
                  <div class="social-links">
-                     <a href="#tiktok">
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                             <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
-                             <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-                         </svg>
-                         Tiktok
+                     <a href="#" target="_blank" rel="noopener noreferrer">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-1.75-1.1c-.6-.54-1.15-.9-2.06-1.11a5.34 5.34 0 0 0-2.51-.41H12v10.61a2.8 2.8 0 1 1-5.6 0c0-1.54 1.26-2.8 2.8-2.8.1 0 .19 0 .28.07v-3.1a5.6 5.6 0 1 0 4.37 5.47V5.61a5.39 5.39 0 0 0 3.86 1.7 4.7 4.7 0 0 0 4.43-4.8 4.82 4.82 0 0 0-1.83-3.82z"/></svg> Tiktok
                      </a>
-                     <a href="#facebook">
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                     <a href="#" target="_blank" rel="noopener noreferrer">
+                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
                              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                         </svg>
-                         Facebook
+                         </svg> Facebook
                      </a>
-                     <a href="#instagram">
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                     <a href="#" target="_blank" rel="noopener noreferrer">
+                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
                              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
                              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                         </svg>
-                         Instagram
+                         </svg> Instagram
                      </a>
-                     <a href="#x">
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                             <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-                         </svg>
-                         X
+                     <a href="#" target="_blank" rel="noopener noreferrer">
+                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+                        </svg> X
                      </a>
-                     <a href="#strava">
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                             <path d="M15 10l-4 4 6 6-10-10 4-4 4 4"></path>
-                         </svg>
-                         Strava
+                     <a href="#" target="_blank" rel="noopener noreferrer">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                            <path d="M15.38 10.4L12 14.3 8.62 10.4 3 17h18l-5.62-6.6zM19.61.75H4.39L12 10.15 19.61.75z"/>
+                        </svg> Strava
                      </a>
-
-
                  </div>
              </div>
-
-             <!-- Order Info Section -->
              <div class="footer-section">
                  <h3 class="footer-title">Order Info</h3>
                  <div class="footer-links">
-                     <a href="#tracking">Order Tracking</a>
-                     <a href="#delivery">Delivery & Returns</a>
-                     <a href="#vouchers">Gift Vouchers</a>
-
+                     <a href="#">Order Tracking</a>
+                     <a href="#">Delivery & Returns</a>
+                     <a href="#">Gift Vouchers</a>
                  </div>
              </div>
-
-             <!-- Company Info Section -->
              <div class="footer-section">
                  <h3 class="footer-title">Company Info</h3>
                  <div class="footer-links">
-                     <a href="#about">About Us</a>
-                     <a href="#privacy">Privacy Policy</a>
-                     <a href="#terms">Terms & Conditions</a>
-
+                     <a href="about.html">About Us</a>
+                     <a href="#">Privacy Policy</a>
+                     <a href="#">Terms & Conditions</a>
                  </div>
              </div>
          </div>
+          <div class="text-center pt-4 mt-4 border-top border-secondary">
+                Copyright © <script>document.write(new Date().getFullYear())</script> Cherus Sportswear. All Rights Reserved
+          </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Check if needed by Bootstrap or other scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    
-    <script src="./main.js"></script> <!-- For getCart, updateCartBadge -->
-    <script src="./checkout.js"></script> <!-- Specific checkout logic -->
-
+   
+    <script src="./main.js"></script> <!-- For getCart, updateCartBadge, hamburger -->
+    <script src="./checkout.js"></script>
 </body>
 </html>
