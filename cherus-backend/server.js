@@ -6,12 +6,15 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const mpesaRoutes = require('./routes/mpesaRoutes');
 const errorHandler = require('./middleware/errorHandler');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const FRONTEND_URL = process.env.FRONTEND_URL || '*'; // Be more specific in production
 
 // --- Middleware ---
+const authMiddleware = require('./middleware/authMiddleware');
+
 // CORS Configuration
 const allowedOrigins = [
     'http://localhost:5500',
@@ -47,6 +50,7 @@ app.use((req, res, next) => {
 app.use('/api/orders', orderRoutes);
 app.use('/api/mpesa', mpesaRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/auth', authRoutes);
 
 // --- Basic Health Check Route ---
 app.get('/', (req, res) => {
