@@ -1,5 +1,5 @@
-const { Product } = require('../models');
-const { Op } = require('sequelize'); // For more complex queries like search
+const { Product, Sequelize } = require('../models'); // Ensure Sequelize is imported for Op
+const { Op } = Sequelize; // For more complex queries like search
 
 // Fetch all products with pagination, filtering, and sorting
 exports.getAllProducts = async (req, res, next) => {
@@ -15,19 +15,30 @@ exports.getAllProducts = async (req, res, next) => {
 
         // Filtering
         if (category && category !== 'all') {
-            whereClause.category = category;
+            whereClause.category = { [Op.iLike]: category }; // Made category filtering case-insensitive
         }
         if (subcategory) {
-            whereClause.subcategory = subcategory;
+            whereClause.subcategory = { [Op.iLike]: subcategory }; // Made subcategory filtering case-insensitive
         }
-        if (searchQuery) {
-            whereClause[Op.or] = [
-                { name: { [Op.iLike]: `%${searchQuery}%` } }, // Case-insensitive search
-                { description: { [Op.iLike]: `%${searchQuery}%` } },
-                { category: { [Op.iLike]: `%${searchQuery}%` } },
-                { subcategory: { [Op.iLike]: `%${searchQuery}%` } },
+
+        // --- SEARCH LOGIC ---
+        if (searchQuery && searchQuery.trim() !== '') { // Ensure searchQuery is not empty after trimming
+            const searchTerm = `%${searchQuery.trim()}%`; // Prepare for LIKE query (case-insensitive due to Op.iLike)
+            const plainSearchTermForTags = searchQuery.trim(); // For tag matching, might not need wildcards if searching for exact tag presence
+
+            // Initialize the OR conditions array for search
+            const searchConditions = [
+                { name: { [Op.iLike]: searchTerm } },
+                { description: { [Op.iLike]: searchTerm } },
+                { category: { [Op.iLike]: searchTerm } },
+                { subcategory: { [Op.iLike]: searchTerm } },
+                // { brand: { [Op.iLike]: searchTerm } } // <-- ADDED: Search by brand
             ];
+
+            whereClause[Op.or] = searchConditions;
         }
+        // --- END OF SEARCH LOGIC ---
+
 
         // Sorting
         switch (sort) {
@@ -61,6 +72,7 @@ exports.getAllProducts = async (req, res, next) => {
             totalProducts: count
         });
     } catch (error) {
+        console.error("Error in getAllProducts controller:", error); // Added specific error logging
         next(error);
     }
 };
