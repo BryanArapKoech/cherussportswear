@@ -28,4 +28,54 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Password error:', passwordErrorElement?.id);
     console.log('Password confirm error:', passwordConfirmErrorElement?.id);
     console.log('Form error:', formErrorElement?.id);
+
+    // --- Email Validation Functions ---
+    function getEmailValue() {
+        return emailInput.value.trim();
+    }
+
+    function isValidEmailFormat(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function displayEmailError(message) {
+        if (emailErrorElement) {
+            emailErrorElement.textContent = message;
+            emailErrorElement.style.display = 'block';
+        }
+    }
+
+    function clearEmailError() {
+        if (emailErrorElement) {
+            emailErrorElement.textContent = '';
+            emailErrorElement.style.display = 'none';
+        }
+    }
+
+    // Real-time email validation
+    if (emailInput) {
+        emailInput.addEventListener('input', function () {
+            const email = getEmailValue();
+
+            if (!email) {
+                displayEmailError('Email is required');
+            } else if (!isValidEmailFormat(email)) {
+                displayEmailError('Please enter a valid email address');
+            } else {
+                clearEmailError();
+            }
+        });
+    }
+
+    // Test email validation functions
+    console.log('Initial email value:', getEmailValue());
+    console.log('Valid email test:', isValidEmailFormat('test@example.com')); // Should be true
+    console.log('Invalid email test:', isValidEmailFormat('test')); // Should be false
+
+    // Test error display and clear
+    displayEmailError('Test error message'); // Should display in the UI
+    setTimeout(() => {
+        clearEmailError(); // Should clear the error after 2 seconds
+    }, 2000);
 }); 
