@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // TODO: Replace with actual API call
             // Example API call structure:
-            /*
+            
             fetch('/api/register', {
                 method: 'POST',
                 headers: {
@@ -380,15 +380,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 showError('registerError', 'An error occurred. Please try again.');
                 console.error('Registration error:', error);
             });
-            */
+            
             
             // For now, simulate API call
-            setTimeout(() => {
-                hideSpinner('registerSpinner', 'registerBtn');
-                showSuccess('registerSuccess', 'Account created successfully! Welcome to Cherus Sportswear!');
-                registerForm.reset();
-                clearAllErrors();
-            }, 2000);
+            // setTimeout(() => {
+            //     hideSpinner('registerSpinner', 'registerBtn');
+            //     showSuccess('registerSuccess', 'Account created successfully! Welcome to Cherus Sportswear!');
+            //     registerForm.reset();
+            //     clearAllErrors();
+            // }, 2000);
         });
     }
 
@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // TODO: Replace with actual API call
             // Example API call structure:
-            /*
+        
             fetch('/api/login', {
                 method: 'POST',
                 headers: {
@@ -464,18 +464,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 showError('loginError', 'An error occurred. Please try again.');
                 console.error('Login error:', error);
             });
-            */
             
-            // For now, simulate API call
-            setTimeout(() => {
-                hideSpinner('loginSpinner', 'loginBtn');
-                showSuccess('loginSuccess', 'Login successful! Redirecting...');
-                setTimeout(() => {
-                    // Simulate redirect to dashboard
-                    console.log('Redirecting to dashboard...');
-                    // window.location.href = 'dashboard.html';
-                }, 1500);
-            }, 2000);
+            
+            // // For now, simulate API call
+            // setTimeout(() => {
+            //     hideSpinner('loginSpinner', 'loginBtn');
+            //     showSuccess('loginSuccess', 'Login successful! Redirecting...');
+            //     setTimeout(() => {
+            //         // Simulate redirect to dashboard
+            //         console.log('Redirecting to dashboard...');
+            //         // window.location.href = 'dashboard.html';
+            //     }, 1500);
+            // }, 2000);
         });
     }
 
