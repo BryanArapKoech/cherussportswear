@@ -20,7 +20,8 @@ module.exports = {
     dialectOptions: { // Example for production SSL
       ssl: {
         require: true,
-        rejectUnauthorized: false // Adjust based on your provider's requirements
+        // rejectUnauthorized: false 
+        rejectUnauthorized: true
       }
     },
     // logging: false,
