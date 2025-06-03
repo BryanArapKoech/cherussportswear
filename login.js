@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             
             
-            // For now, simulate API call
+            // simulate API call
             // setTimeout(() => {
             //     hideSpinner('registerSpinner', 'registerBtn');
             //     showSuccess('registerSuccess', 'Account created successfully! Welcome to Cherus Sportswear!');
@@ -466,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             
             
-            // // For now, simulate API call
+            // //simulate API call
             // setTimeout(() => {
             //     hideSpinner('loginSpinner', 'loginBtn');
             //     showSuccess('loginSuccess', 'Login successful! Redirecting...');
