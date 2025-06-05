@@ -529,9 +529,9 @@ document.addEventListener('DOMContentLoaded', function () {
             
             showSpinner('loginSpinner', 'loginBtn');
 
-            const apiBaseUrl = 'http://localhost:3000'; 
+            
 
-            fetch(`${apiBaseUrl}/api/auth/login`, {
+            fetch(`${config.apiBaseUrl}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

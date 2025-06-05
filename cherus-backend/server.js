@@ -7,13 +7,63 @@ const orderRoutes = require('./routes/orderRoutes');
 const mpesaRoutes = require('./routes/mpesaRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
+const helmet = require('helmet'); 
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const FRONTEND_URL = process.env.FRONTEND_URL || '*'; // Be more specific in production
+const FRONTEND_URL = process.env.FRONTEND_URL || '*';
 
 // --- Middleware ---
 const authMiddleware = require('./middleware/authMiddleware');
+
+
+// --- START: Helmet Security Headers ---
+
+app.use(helmet());
+
+// Content Security Policy (CSP) configuration
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"], // By default, only allow content from the same origin
+      scriptSrc: [
+        "'self'", // Allow scripts from own origin
+        "https://cdn.jsdelivr.net", // For Bootstrap JS (from login.html)
+        "https://cdnjs.cloudflare.com" // For Font Awesome (from login.html)
+        // Add other trusted CDNs or script sources frontend uses them.
+       
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", 
+        "https://cdn.jsdelivr.net", 
+        "https://cdnjs.cloudflare.com", 
+        "https://fonts.googleapis.com", // For Remixicon fonts 
+        "https://cdn.jsdelivr.net" 
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com", // For Google Fonts (Remixicon)
+        "https://cdn.jsdelivr.net", // For Remixicon fonts 
+        "https://cdnjs.cloudflare.com" // For Font Awesome fonts
+      ],
+      imgSrc: ["'self'", "data:"], // Allow images from own origin and data URIs. 
+      connectSrc: [
+        "'self'", // Allow XHR/fetch to own origin
+        
+        // For M-Pesa sandbox/production, if calls are made from frontend:
+        // 'https://sandbox.safaricom.co.ke',
+        // 'https://api.safaricom.co.ke'
+      ],
+      frameSrc: ["'none'"], 
+      objectSrc: ["'none'"], // Disallow <object>, <embed>, <applet>
+      
+    },
+  })
+);
+// --- END: Helmet Security Headers ---
+
 
 // CORS Configuration
 const allowedOrigins = [
@@ -40,11 +90,30 @@ const allowedOrigins = [
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
-// Basic Logging Middleware (Optional)
+// Basic Logging Middleware 
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
     next();
 });
+
+// --- START: Rate Limiting Configuration ---
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 requests per windowMs to /api/auth/login
+    message: { success: false, message: 'Too many login attempts from this IP, please try again after 15 minutes.' },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    // keyGenerator: (req, res) => req.ip, 
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 5, 
+    message: { success: false, message: 'Too many accounts created from this IP, please try again after an hour.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+// --- END: Rate Limiting Configuration ---
 
 // --- API Routes ---
 app.use('/api/orders', orderRoutes);
@@ -71,9 +140,9 @@ const startServer = async () => {
         
         
         if (process.env.NODE_ENV === 'development') {
-             // await db.sequelize.sync({ alter: true }); // Tries to alter tables to match models
+             // await db.sequelize.sync({ alter: true }); 
              // console.log('Database synchronized (alter).');
-             // OR use migrations: npx sequelize-cli db:migrate (safer)
+             
         }
 
 

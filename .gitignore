@@ -23,3 +23,6 @@ yarn-error.log*
 # Build output
 dist/
 build/
+
+
+security.md
