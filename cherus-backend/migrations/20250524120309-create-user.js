@@ -11,7 +11,7 @@ module.exports = {
       email: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true // ADDED: Ensures email addresses are unique in the database
+        unique: true // Ensures email addresses are unique in the database
       },
       password: {
         type: Sequelize.STRING,

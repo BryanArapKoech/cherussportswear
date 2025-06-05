@@ -1,5 +1,14 @@
+// login.js
 document.addEventListener('DOMContentLoaded', function () {
     console.log('Enhanced login form loaded');
+
+    // Configuration
+    const config = {
+        apiBaseUrl: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3000' 
+            : 'https://your-production-api.com',
+        redirectDelay: 1500
+    };
 
     // State management
     let isLoginMode = false;
@@ -11,6 +20,57 @@ document.addEventListener('DOMContentLoaded', function () {
     const switchTitle = document.getElementById('switchTitle');
     const switchLink = document.getElementById('switchLink');
     const closeBtn = document.querySelector('.close-btn');
+
+    // Enhanced error handling for different HTTP status codes
+    function getErrorMessage(error, isLogin = false) {
+        const status = error.status;
+        const defaultMessage = isLogin ? 'Login failed. Please try again.' : 'Registration failed. Please try again.';
+        
+        switch (status) {
+            case 409:
+                return 'An account with this email already exists. Please try signing in instead.';
+            case 400:
+                return error.data?.message || 'Please check your input and try again.';
+            case 401:
+                return 'Invalid email or password. Please try again.';
+            case 429:
+                return 'Too many attempts. Please wait a moment before trying again.';
+            case 500:
+                return 'Server error. Please try again later.';
+            default:
+                return error.data?.message || defaultMessage;
+        }
+    }
+
+    // Safe storage helper (falls back to memory if localStorage unavailable)
+    const storage = {
+        setItem: function(key, value) {
+            try {
+                if (typeof Storage !== "undefined" && localStorage) {
+                    localStorage.setItem(key, value);
+                } else {
+                    // Fallback to memory storage (for environments without localStorage)
+                    window.tempStorage = window.tempStorage || {};
+                    window.tempStorage[key] = value;
+                }
+            } catch (e) {
+                console.warn('Storage not available, using memory fallback');
+                window.tempStorage = window.tempStorage || {};
+                window.tempStorage[key] = value;
+            }
+        },
+        getItem: function(key) {
+            try {
+                if (typeof Storage !== "undefined" && localStorage) {
+                    return localStorage.getItem(key);
+                } else {
+                    return window.tempStorage ? window.tempStorage[key] : null;
+                }
+            } catch (e) {
+                return window.tempStorage ? window.tempStorage[key] : null;
+            }
+        }
+    };
 
     // Form switching functionality
     function toggleFormMode() {
@@ -124,6 +184,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (!/[0-9]/.test(password)) {
             errors.push('Password must include at least one number');
+        }
+        if (!/[!@#$%^&*]/.test(password)) { 
+            errors.push('Password must include at least one special character (e.g., !@#$%^&*).');
         }
         
         return errors;
@@ -303,55 +366,61 @@ document.addEventListener('DOMContentLoaded', function () {
             hideError('registerError');
             hideSuccess('registerSuccess');
             
-            const registerEmail = document.getElementById('registerEmail');
-            const registerPassword = document.getElementById('registerPassword');
-            const confirmPassword = document.getElementById('registerConfirmPassword');
+            // Get fresh references to input elements inside the submit handler
+
             
-            const email = registerEmail.value.trim();
-            const password = registerPassword.value;
-            const confirm = confirmPassword.value;
+            const registerEmailInput = document.getElementById('registerEmail');
+            const registerPasswordInput = document.getElementById('registerPassword');
+            const confirmPasswordInput = document.getElementById('registerConfirmPassword');
             
-            // Validate all fields
+            const email = registerEmailInput.value.trim();
+            const password = registerPasswordInput.value;
+            const confirmPasswordValue = confirmPasswordInput.value;
+            
+            // Client-side validation
             let hasErrors = false;
             
+            // Email validation
             if (!email) {
                 showError('registerEmailError', 'Email is required');
                 hasErrors = true;
             } else if (!isValidEmail(email)) {
                 showError('registerEmailError', 'Please enter a valid email address');
                 hasErrors = true;
+            } else {
+                hideError('registerEmailError');
             }
-            
+
+            // Password validation
+            const passwordValidationErrors = validatePassword(password);
             if (!password) {
                 showError('registerPasswordError', 'Password is required');
                 hasErrors = true;
+            } else if (passwordValidationErrors.length > 0) {
+                showError('registerPasswordError', passwordValidationErrors);
+                hasErrors = true;
             } else {
-                const passwordErrors = validatePassword(password);
-                if (passwordErrors.length > 0) {
-                    showError('registerPasswordError', passwordErrors);
-                    hasErrors = true;
-                }
+                hideError('registerPasswordError');
             }
             
-            if (!confirm) {
+            // Confirm Password validation
+            if (!confirmPasswordValue) {
                 showError('confirmPasswordError', 'Please confirm your password');
                 hasErrors = true;
-            } else if (password !== confirm) {
+            } else if (password && password !== confirmPasswordValue) {
                 showError('confirmPasswordError', 'Passwords do not match');
                 hasErrors = true;
+            } else if (password && password === confirmPasswordValue) {
+                hideError('confirmPasswordError');
             }
-            
+
             if (hasErrors) {
                 return;
             }
-            
-            // Show loading state
+
             showSpinner('registerSpinner', 'registerBtn');
             
-            // TODO: Replace with actual API call
-            // Example API call structure:
-            
-            fetch('/api/register', {
+            fetch(`${config.apiBaseUrl}/api/auth/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -361,34 +430,63 @@ document.addEventListener('DOMContentLoaded', function () {
                     password: password
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        const error = new Error(errorData.message || 'Server responded with an error');
+                        error.data = errorData;
+                        error.status = response.status;
+                        throw error;
+                    }).catch(jsonParseError => {
+                        const error = new Error(`HTTP error! Status: ${response.status}`);
+                        error.status = response.status;
+                        throw error;
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 hideSpinner('registerSpinner', 'registerBtn');
                 if (data.success) {
-                    showSuccess('registerSuccess', 'Account created successfully! Welcome to Cherus Sportswear!');
+                    showSuccess('registerSuccess', data.message || 'Account created successfully! Welcome to Cherus Sportswear!');
                     registerForm.reset();
-                    // Optionally redirect after success
+                    hideError('registerEmailError');
+                    hideError('registerPasswordError');
+                    hideError('confirmPasswordError');
+                    
+                    // Auto-switch to login after successful registration
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        if (!isLoginMode) {
+                            toggleFormMode();
+                            showSuccess('loginSuccess', 'Registration successful! You can now sign in.');
+                        }
                     }, 2000);
                 } else {
-                    showError('registerError', data.message || 'Registration failed. Please try again.');
+                    const errorMessage = getErrorMessage(data, false);
+                    showError('registerError', errorMessage);
                 }
             })
             .catch(error => {
                 hideSpinner('registerSpinner', 'registerBtn');
-                showError('registerError', 'An error occurred. Please try again.');
+                const errorMessage = getErrorMessage(error, false);
+                showError('registerError', errorMessage);
                 console.error('Registration error:', error);
+                
+                // Special handling for duplicate email - suggest switching to login
+                if (error.status === 409) {
+                    setTimeout(() => {
+                        const switchToLogin = confirm('Would you like to login instead?');
+                        if (switchToLogin && !isLoginMode) {
+                            toggleFormMode();
+                            // Pre-fill the email
+                            const loginEmailInput = document.getElementById('loginEmail');
+                            if (loginEmailInput) {
+                                loginEmailInput.value = email;
+                            }
+                        }
+                    }, 1000);
+                }
             });
-            
-            
-            // simulate API call
-            // setTimeout(() => {
-            //     hideSpinner('registerSpinner', 'registerBtn');
-            //     showSuccess('registerSuccess', 'Account created successfully! Welcome to Cherus Sportswear!');
-            //     registerForm.reset();
-            //     clearAllErrors();
-            // }, 2000);
         });
     }
 
@@ -400,13 +498,12 @@ document.addEventListener('DOMContentLoaded', function () {
             hideError('loginError');
             hideSuccess('loginSuccess');
             
-            const loginEmail = document.getElementById('loginEmail');
-            const loginPassword = document.getElementById('loginPassword');
+            const loginEmailInput = document.getElementById('loginEmail');
+            const loginPasswordInput = document.getElementById('loginPassword');
             
-            const email = loginEmail.value.trim();
-            const password = loginPassword.value;
+            const email = loginEmailInput.value.trim();
+            const password = loginPasswordInput.value;
             
-            // Validate fields
             let hasErrors = false;
             
             if (!email) {
@@ -415,24 +512,26 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (!isValidEmail(email)) {
                 showError('loginEmailError', 'Please enter a valid email address');
                 hasErrors = true;
+            } else {
+                hideError('loginEmailError');
             }
             
             if (!password) {
                 showError('loginPasswordError', 'Password is required');
                 hasErrors = true;
+            } else {
+                hideError('loginPasswordError');
             }
             
             if (hasErrors) {
                 return;
             }
             
-            // Show loading state
             showSpinner('loginSpinner', 'loginBtn');
-            
-            // TODO: Replace with actual API call
-            // Example API call structure:
-        
-            fetch('/api/login', {
+
+            const apiBaseUrl = 'http://localhost:3000'; 
+
+            fetch(`${apiBaseUrl}/api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -442,40 +541,42 @@ document.addEventListener('DOMContentLoaded', function () {
                     password: password
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        const error = new Error(errorData.message || 'Server responded with an error');
+                        error.data = errorData;
+                        error.status = response.status;
+                        throw error;
+                    }).catch(jsonParseError => {
+                        const error = new Error(`HTTP error! Status: ${response.status}`);
+                        error.status = response.status;
+                        throw error;
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 hideSpinner('loginSpinner', 'loginBtn');
                 if (data.success) {
-                    showSuccess('loginSuccess', 'Login successful! Redirecting...');
-                    // Store authentication token if provided
+                    showSuccess('loginSuccess', data.message || 'Login successful! Redirecting...');
                     if (data.token) {
-                        localStorage.setItem('authToken', data.token);
+                        storage.setItem('authToken', data.token);
                     }
-                    // Redirect to dashboard or previous page
                     setTimeout(() => {
-                        window.location.href = data.redirectUrl || 'dashboard.html';
-                    }, 1500);
+                        window.location.href = data.redirectUrl || 'index.html';
+                    }, config.redirectDelay);
                 } else {
-                    showError('loginError', data.message || 'Invalid email or password. Please try again.');
+                    const errorMessage = getErrorMessage(data, true);
+                    showError('loginError', errorMessage);
                 }
             })
             .catch(error => {
                 hideSpinner('loginSpinner', 'loginBtn');
-                showError('loginError', 'An error occurred. Please try again.');
+                const errorMessage = getErrorMessage(error, true);
+                showError('loginError', errorMessage);
                 console.error('Login error:', error);
             });
-            
-            
-            // //simulate API call
-            // setTimeout(() => {
-            //     hideSpinner('loginSpinner', 'loginBtn');
-            //     showSuccess('loginSuccess', 'Login successful! Redirecting...');
-            //     setTimeout(() => {
-            //         // Simulate redirect to dashboard
-            //         console.log('Redirecting to dashboard...');
-            //         // window.location.href = 'dashboard.html';
-            //     }, 1500);
-            // }, 2000);
         });
     }
 
