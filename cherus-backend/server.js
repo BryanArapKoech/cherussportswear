@@ -35,9 +35,33 @@ const authMiddleware = require('./middleware/authMiddleware');
 
 app.use(cookieParser());
 
+//--- START: HTTPS Redirect and HSTS (for Production) ---
+if (process.env.NODE_ENV === 'production') {
+    // Trust the X-Forwarded-Proto header from your reverse proxy/load balancer
+    // The number '1' means trust the first hop (your immediate proxy).
+    // Adjust if you have multiple proxies.
+    app.set('trust proxy', 1); 
+
+    // Redirect HTTP to HTTPS if X-Forwarded-Proto is http
+    app.use((req, res, next) => {
+        if (req.headers['x-forwarded-proto'] !== 'https') {
+            // Log the redirect for monitoring if desired
+            console.log(`Redirecting HTTP to HTTPS: ${req.hostname}${req.url}`);
+            return res.redirect('https://' + req.hostname + req.url);
+        }
+        next();
+    });
+}
+// --- END: HTTPS Redirect ---
+
+
 // --- START: Helmet Security Headers ---
 
-app.use(helmet());
+app.use(helmet({
+    hsts: process.env.NODE_ENV === 'production' 
+        ? { maxAge: 31536000, includeSubDomains: true, preload: true } // 1 year HSTS for production
+        : false // Disable HSTS in development to avoid issues if not using HTTPS locally
+}));
 
 // Content Security Policy (CSP) configuration
 app.use(

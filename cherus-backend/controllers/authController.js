@@ -2,7 +2,7 @@
 
 
 
-const { User } = require('../models');
+const { User, LoginAttempt } = require('../models');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -83,7 +83,43 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
+    // --- Helper function to get client IP address, handling proxies ---
+    // Place this helper inside or make it accessible if used elsewhere
+    const getIpAddress = (request) => {
+        const forwardedFor = request.headers['x-forwarded-for'];
+        if (forwardedFor) {
+            // 'x-forwarded-for' can be a comma-separated list if multiple proxies
+            return forwardedFor.split(',').shift().trim();
+        }
+        return request.socket?.remoteAddress || request.ip; // Fallback to socket.remoteAddress or req.ip
+    };
+
+    const ipAddress = getIpAddress(req);
+    const userAgent = req.headers['user-agent'] || null; // Get user agent, or null if not present
+
+    // --- Helper function to log login attempt ---
+    // This is created as a separate async function to avoid forgetting `await`
+    // and to keep the main logic cleaner.
+    const logAttempt = async (isSuccessful, reason = null) => {
+        try {
+            await LoginAttempt.create({
+                emailAttempted: email, // Log the email that was attempted
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                successful: isSuccessful,
+                failureReason: reason
+                // attemptedAt is set by defaultValue in the model/DB
+            });
+        } catch (logError) {
+            // Log to console if LoginAttempt creation fails, but don't let it break the login flow
+            console.error('Failed to log login attempt:', logError);
+        }
+    };
+    // --- End helper function ---
+
+
     if (!email || !password) {             
+        await logAttempt(false, 'missing_credentials');
         return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
 
@@ -91,14 +127,19 @@ exports.login = async (req, res, next) => {
         const user = await User.findOne({ where: { email } });
         if (!user) {
             // To match login.js error handling
+            await logAttempt(false, 'user_not_found');
             return res.status(401).json({ success: false, message: 'Invalid email or password. Please try again.' });
         }
 
         const isValidPassword = user.validPassword(password); // validPassword method from User model
         if (!isValidPassword) {
              // To match login.js error handling
+            await logAttempt(false, 'invalid_password');
             return res.status(401).json({ success: false, message: 'Invalid email or password. Please try again.' });
         }
+
+         // If password is valid, log successful attempt
+        await logAttempt(true);
 
         const authToken = jwt.sign(
             { id: user.id, email: user.email },
@@ -135,7 +176,12 @@ exports.login = async (req, res, next) => {
 
     } catch (error) {
         console.error('Error during user login:', error);
+        // Log a generic server error attempt if it reaches here, though specific errors are caught above
+        // This might not have `email` defined if the error is very early, so be cautious.
         // next(error);
+         if (email) { // Only log if email was part of the request context
+            await logAttempt(false, 'server_error');
+        }
         return res.status(500).json({ success: false, message: 'An error occurred. Please try again.' }); // To match login.js
     }
 };
