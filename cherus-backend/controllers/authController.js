@@ -4,6 +4,7 @@
 
 const { User } = require('../models');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 exports.register = async (req, res, next) => {
     const { email, password } = req.body;
@@ -82,9 +83,7 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-        // This was returning: return res.status(400).json({ message: 'Email and password are required.' });
-        // Aligning with frontend expectation of success property:
+    if (!email || !password) {             
         return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
 
@@ -101,11 +100,27 @@ exports.login = async (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Invalid email or password. Please try again.' });
         }
 
-        const token = jwt.sign(
+        const authToken = jwt.sign(
             { id: user.id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
+
+        // CSRF Token Generation & Cookie Setting ---
+        const csrfToken = crypto.randomBytes(32).toString('hex');
+
+        res.cookie('csrfToken', csrfToken, { // Name of the cookie
+            // HttpOnly: true, // JS cannot access. For double-submit, frontend *might* need to read it if not also sent in body.
+                               // If frontend reads from JSON body, HttpOnly can be true for the cookie.
+                               // Let's make it accessible to JS for simplicity if frontend needs to read from cookie directly.
+            httpOnly: false,   // Set to true if frontend exclusively uses the CSRF token from JSON response body.
+            secure: process.env.NODE_ENV === 'production', // Send only over HTTPS in production
+            sameSite: 'Lax', // Or 'Strict'. 'Lax' is a good default.
+            // path: '/', // Optional: cookie available for all paths
+            // maxAge: 1 * 60 * 60 * 1000 // Optional: 1 hour expiry, same as JWT for consistency
+        });
+        
+
 
         res.status(200).json({
             success: true, // To match login.js
@@ -114,7 +129,8 @@ exports.login = async (req, res, next) => {
                 id: user.id,
                 email: user.email,
             },
-            token: token // login.js expects this
+            token: authToken, // The JWT Auth Token
+            csrfToken: csrfToken // Send CSRF token in body as well, for frontend to easily grab
         });
 
     } catch (error) {

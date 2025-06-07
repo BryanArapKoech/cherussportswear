@@ -563,6 +563,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.token) {
                         storage.setItem('authToken', data.token);
                     }
+
+                     // --- START: Store CSRF Token ---
+        if (data.csrfToken) {
+            sessionStorage.setItem('csrfToken', data.csrfToken);            
+            console.log('CSRF Token stored in sessionStorage:', 
+                data.csrfToken);
+        }
+        // --- END: Store CSRF Token ---
+
+
                     setTimeout(() => {
                         window.location.href = data.redirectUrl || 'index.html';
                     }, config.redirectDelay);

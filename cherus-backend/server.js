@@ -9,6 +9,22 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
 const helmet = require('helmet'); 
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
+
+
+// Example: In a hypothetical protected_routes.js
+// const express = require('express');
+// const router = express.Router();
+// const authMiddleware = require('../middleware/authMiddleware');
+// const csrfMiddleware = require('../middleware/csrfMiddleware');
+
+// router.use(authMiddleware.verifyToken); // First, ensure user is authenticated
+// router.use(csrfMiddleware); // Then, check CSRF token for state-changing methods
+
+// router.post('/update-profile', (req, res) => { /* ... */ });
+// router.delete('/delete-item/:id', (req, res) => { /* ... */ });
+
+// module.exports = router;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +33,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || '*';
 // --- Middleware ---
 const authMiddleware = require('./middleware/authMiddleware');
 
+app.use(cookieParser());
 
 // --- START: Helmet Security Headers ---
 
@@ -51,10 +68,12 @@ app.use(
       imgSrc: ["'self'", "data:"], // Allow images from own origin and data URIs. 
       connectSrc: [
         "'self'", // Allow XHR/fetch to own origin
+        'http://localhost:3000',
         
         // For M-Pesa sandbox/production, if calls are made from frontend:
         // 'https://sandbox.safaricom.co.ke',
         // 'https://api.safaricom.co.ke'
+        
       ],
       frameSrc: ["'none'"], 
       objectSrc: ["'none'"], // Disallow <object>, <embed>, <applet>
