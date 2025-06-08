@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
     const resetPasswordForm = document.getElementById('resetPasswordForm');
     const submitBtn = document.getElementById('submitBtn');
     const spinner = document.getElementById('spinner');
@@ -8,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = document.getElementById('errorMessage');
     const passwordError = document.getElementById('passwordError');
     const confirmPasswordError = document.getElementById('confirmPasswordError');
+    const backToLoginLink = document.getElementById('backToLoginLink');
 
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
@@ -19,12 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Form Submission Logic ---
     if (resetPasswordForm) {
         resetPasswordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Clear previous errors
             passwordError.style.display = 'none';
             confirmPasswordError.style.display = 'none';
             errorMessage.style.display = 'none';
@@ -32,10 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            // --- Client-side validation ---
             let isValid = true;
-            if (newPassword.length < 8) { // Basic validation, server has the full rules
-                passwordError.textContent = 'Password must be at least 8 characters.';
+            if (newPassword.length < 8 || !/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword) || !/[!@#$%^&*]/.test(newPassword)) {
+                passwordError.textContent = 'Password does not meet complexity requirements.';
                 passwordError.style.display = 'block';
                 isValid = false;
             }
@@ -48,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isValid) {
                 return;
             }
-            // --- End validation ---
 
             spinner.style.display = 'inline-block';
             btnText.textContent = 'Resetting...';
@@ -71,18 +67,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (!response.ok) {
-                    // Throw an error to be caught by the catch block
                     throw new Error(data.message || 'An unknown error occurred.');
                 }
                 
-                // For now, log the success message.
-                console.log('Success:', data.message);
+                resetPasswordForm.style.display = 'none';
+                successMessage.textContent = 'Password reset successfully! Redirecting to login...';
+                successMessage.style.display = 'block';
+                backToLoginLink.style.display = 'flex';
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 3000);
                 
             } catch (error) {
                 errorMessage.textContent = error.message;
                 errorMessage.style.display = 'block';
-            } finally {
-                
                 spinner.style.display = 'none';
                 btnText.textContent = 'Reset Password';
                 submitBtn.disabled = false;
@@ -90,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // The logic for password visibility toggles added for UX.
     const passwordToggles = document.querySelectorAll('.password-toggle');
     passwordToggles.forEach(toggle => {
         toggle.addEventListener('click', function(e) {
