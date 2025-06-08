@@ -1,17 +1,12 @@
 // cherus-backend/routes/passwordRoutes.js
 const express = require('express');
 const router = express.Router();
+const passwordController = require('../controllers/passwordController');
 
-// Stub for password reset request
-// POST /api/password/forgot
-router.post('/forgot', (req, res) => {
-    res.status(200).json({ message: 'Forgot password endpoint reached.' });
-});
 
-// Stub for password reset submission
-// POST /api/password/reset
-router.post('/reset', (req, res) => {
-    res.status(200).json({ message: 'Reset password endpoint reached.' });
-});
+router.post('/forgot', passwordController.forgotPassword);
+
+
+router.post('/reset', passwordController.resetPassword);
 
 module.exports = router;
