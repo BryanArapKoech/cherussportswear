@@ -1,29 +1,23 @@
-const { Order, OrderItem, sequelize } = require('../models'); // Import models and sequelize for transactions
+const { Order, OrderItem, sequelize, Product } = require('../models'); // Import models and sequelize for transactions
 const mpesaService = require('../services/mpesaService');
 const { v4: uuidv4 } = require('uuid'); // For unique order refs if needed beyond DB id
 
-// --- IMPORTANT: Server-side Product Price Lookup ---
-// In a real app, fetch current prices from your product database/service here.
-// DO NOT trust prices sent from the frontend.
+
+//price lookup function to fetch from the DB
 async function getProductPrice(productId) {
-    // Placeholder: Replace with actual database lookup
-    console.warn(`WARN: Using placeholder price for productId: ${productId}`);
-    // Example: Simulate fetching price based on ID pattern
-    if (productId === 'static-nike') return 2500.00;
-    if (productId >= 1 && productId <= 22) return 1650.00; // Example range
-    if (productId == 1) return 1500.00;
-    if (productId == 2) return 1800.00;
-    if (productId == 20) return 2800.00;
-    if (productId == 60) return 3500.00;
-     if (productId == 4989) return 1200.00;
-     if (productId == 7087) return 300.00; // Example price for socks
-    // Add more specific IDs or implement DB lookup
-    return 1000.00; // Default fallback placeholder
+    const product = await Product.findByPk(productId);
+    if (!product) throw new Error(`Product with ID ${productId} not found.`);
+    return parseFloat(product.price);
 }
 
 exports.createOrder = async (req, res, next) => {
     // Get the user ID from the token verification middleware
-    const userId = req.user.id;
+    const userId = req.user?.id;
+     if (!userId) {
+        //response if the token is missing or invalid.
+        return res.status(401).json({ message: 'Authentication required. Please log in.' });
+    }
+    
     const { cart, shipping, paymentMethod, mpesaPhone } = req.body;
 
     // --- Input Validation ---
