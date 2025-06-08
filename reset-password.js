@@ -1,34 +1,96 @@
 document.addEventListener('DOMContentLoaded', () => {
+    
     const resetPasswordForm = document.getElementById('resetPasswordForm');
     const submitBtn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.querySelector('.btn-text');
+    const successMessage = document.getElementById('successMessage');
     const errorMessage = document.getElementById('errorMessage');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
 
-    // --- Task 15: Retrieve Token from URL ---
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
 
     if (!token) {
-        // If no token is found in the URL, the form is useless.
-        // Disable the form and show a permanent error message.
-        resetPasswordForm.style.display = 'none'; // Hide the form
+        resetPasswordForm.style.display = 'none';
         errorMessage.textContent = 'Invalid or missing password reset link. Please request a new one.';
         errorMessage.style.display = 'block';
-        return; // Stop further execution
+        return;
     }
-    
-    // For now, we'll just log the token to confirm it was retrieved.
-    console.log('Password reset token found:', token);
 
-    // The logic for form submission (Task 16) will be added later.
+    // Form Submission Logic ---
     if (resetPasswordForm) {
-        resetPasswordForm.addEventListener('submit', (e) => {
+        resetPasswordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            console.log('Form submission prevented for now.');
-            // We will implement the API call in the next task.
+
+            // Clear previous errors
+            passwordError.style.display = 'none';
+            confirmPasswordError.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // --- Client-side validation ---
+            let isValid = true;
+            if (newPassword.length < 8) { // Basic validation, server has the full rules
+                passwordError.textContent = 'Password must be at least 8 characters.';
+                passwordError.style.display = 'block';
+                isValid = false;
+            }
+            if (newPassword !== confirmPassword) {
+                confirmPasswordError.textContent = 'Passwords do not match.';
+                confirmPasswordError.style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+            // --- End validation ---
+
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Resetting...';
+            submitBtn.disabled = true;
+
+            const apiBaseUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                ? 'http://localhost:3000'
+                : 'https://your-production-api.com';
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/password/reset`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        password: newPassword,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    // Throw an error to be caught by the catch block
+                    throw new Error(data.message || 'An unknown error occurred.');
+                }
+                
+                // For now, log the success message.
+                console.log('Success:', data.message);
+                
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+            } finally {
+                
+                spinner.style.display = 'none';
+                btnText.textContent = 'Reset Password';
+                submitBtn.disabled = false;
+            }
         });
     }
 
-    // The logic for password visibility toggles can be added now for UX.
+    // The logic for password visibility toggles added for UX.
     const passwordToggles = document.querySelectorAll('.password-toggle');
     passwordToggles.forEach(toggle => {
         toggle.addEventListener('click', function(e) {
