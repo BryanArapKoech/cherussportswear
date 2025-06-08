@@ -92,12 +92,16 @@ exports.resetPassword = async (req, res, next) => {
 
         // 5. Set the new password 
         user.password = password;
+         user.reset_token = null;
+        user.reset_token_expires_at = null;
+
         
-        console.log(`New password for ${user.email} has been set and is ready to be saved.`);
+         await user.save();
+        console.log(`New password for ${user.email} has been successfully reset and token invalidated.`);
         
-        // 6. Send ONE final response for this task
-        // In the next task, we will replace this with the final logic.
-        res.status(200).json({ message: 'Password has been prepared for update.' });
+        // 6. Send ONE final response 
+        // IMPORTANT: Do not send any sensitive information in the response.
+        res.status(200).json({ message: 'Password has been successfully reset.' });
 
     } catch (error) {
         console.error('Reset Password Error:', error);
