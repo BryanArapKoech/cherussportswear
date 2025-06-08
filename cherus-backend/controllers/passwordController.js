@@ -1,5 +1,6 @@
 // cherus-backend/controllers/passwordController.js
 const { User } = require('../models');
+const { Op } = require('sequelize');
 const crypto = require('crypto');
 
 exports.forgotPassword = async (req, res, next) => {
@@ -47,7 +48,38 @@ exports.forgotPassword = async (req, res, next) => {
         res.status(500).json({ message: 'An internal server error occurred.' });
     }
 };
+// ---resetPassword ---
+exports.resetPassword = async (req, res, next) => {
+    try {
+        const { token, password } = req.body;
 
-exports.resetPassword = (req, res) => {
-    res.status(200).json({ message: 'Reset password endpoint reached.' });
+        if (!token || !password) {
+            return res.status(400).json({ message: 'Token and new password are required.' });
+        }
+
+        // Find a user with a matching token that has not expired.
+        const user = await User.findOne({
+            where: {
+                reset_token: token,
+                reset_token_expires_at: {
+                    [Op.gt]: new Date() // Op.gt means "greater than" the current time
+                }
+            }
+        });
+
+        // If no user is found, the token is invalid or has expired.
+        if (!user) {
+            console.log(`Reset attempt with invalid or expired token: ${token}`);
+            return res.status(400).json({ message: 'Token is invalid or has expired.' });
+        }
+
+        // For now, if the token is valid, we'll just confirm it.
+        // In the next tasks, we'll add password hashing and saving.
+        console.log(`Valid token received for user: ${user.email}`);
+        res.status(200).json({ message: 'Token is valid.' });
+
+    } catch (error) {
+        console.error('Reset Password Error:', error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
 };
