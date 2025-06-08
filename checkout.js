@@ -149,10 +149,25 @@ document.addEventListener('DOMContentLoaded', function() {
         setLoading(true);
         console.log("Placing order with M-Pesa. Phone:", mpesaFullPhoneNumber);
 
+         // --- Get the token from localStorage ---
+        const token = localStorage.getItem('authToken');
+
+        if (!token) {
+            handlePaymentError("You are not logged in. Please log in to place an order.");
+            setLoading(false);
+
+        // redirect to login page after a delay
+            setTimeout(() => { window.location.href = 'login.html'; }, 3000);
+
+        return;
+    }
+
         try {
             const response = await fetch(`${BACKEND_URL}/api/create-order`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json',
+                     'Authorization': `Bearer ${token}`
+                 },
                 body: JSON.stringify({
                     cart: cart,
                     shipping: shippingDetails,
@@ -181,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // --- Helper Functions (common) ---
+    // --- Helper Functions ---
     function formatPrice(price) {
         return `Kshs. ${Number(price).toFixed(2)}`;
     }
@@ -225,10 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (paymentErrorDiv) paymentErrorDiv.style.display = 'none';
     }
 
-    // handleServerResponse would be called by other payment methods upon *immediate frontend confirmation*
-    // For M-Pesa, this is typically NOT called directly from the STK push initiation response,
-    // but rather after a webhook or polling confirms the payment.
-    // However, it's kept here if you re-enable Card/PayPal which might use it.
+
     function handleServerResponse(data) {
         console.log("Handling server response (e.g., for Card/PayPal immediate success):", data);
         if (data.success) {

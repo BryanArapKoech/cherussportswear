@@ -3,7 +3,11 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Order extends Model {
     static associate(models) {
-      // define association here
+      // An Order BELONGS TO a User
+      Order.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'user'
+      });
       Order.hasMany(models.OrderItem, { // Order has many OrderItems
         foreignKey: 'orderId',
         as: 'items', // Alias to access items via order.items
@@ -12,12 +16,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Order.init({
-    // customerName: DataTypes.STRING, // No need, get from shipping JSON
+     userId: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // Allow for guest orders in the future if needed
+      references: {
+        model: 'Users',
+        key: 'id'
+      }
+    },
     customerPhone: { // Store the primary phone used for order
          type: DataTypes.STRING,
          allowNull: false,
     },
-    customerEmail: DataTypes.STRING, // Optional but good for confirmation
+    customerEmail: DataTypes.STRING, // Store the primary email used for order
     shippingAddress: { // Store structured shipping details
         type: DataTypes.JSON,
         allowNull: false,
@@ -44,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
          type: DataTypes.STRING,
          allowNull: true,
     },
-    // Add other fields like shippingCost, discountAmount etc. if needed
+    // to add other fields like shippingCost, discountAmount etc. if needed
   }, {
     sequelize,
     modelName: 'Order',

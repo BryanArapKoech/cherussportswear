@@ -6,8 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     
     static associate(models) {
-      // define association here if user has relations to other models (e.g., orders)
-      // Example: User.hasMany(models.Order, { foreignKey: 'userId', as: 'userOrders' });
+      // A User HAS MANY Orders 
+      User.hasMany(models.Order, {
+        foreignKey: 'userId',
+        as: 'orders'
+      });
     }
 
     /**

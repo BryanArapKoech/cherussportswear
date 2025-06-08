@@ -22,6 +22,8 @@ async function getProductPrice(productId) {
 }
 
 exports.createOrder = async (req, res, next) => {
+    // Get the user ID from the token verification middleware
+    const userId = req.user.id;
     const { cart, shipping, paymentMethod, mpesaPhone } = req.body;
 
     // --- Input Validation ---
@@ -79,6 +81,7 @@ exports.createOrder = async (req, res, next) => {
 
         // --- Create Order in Database ---
         const newOrder = await Order.create({
+            userId: userId,
             customerPhone: shipping.phone, // Primary contact
             customerEmail: shipping.email,
             shippingAddress: shipping, // Store the whole shipping object
