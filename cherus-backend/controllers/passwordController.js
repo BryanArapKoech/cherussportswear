@@ -1,6 +1,6 @@
 // cherus-backend/controllers/passwordController.js
 const { User } = require('../models');
-const crypto = require('crypto'); // Make sure this line is here
+const crypto = require('crypto');
 
 exports.forgotPassword = async (req, res, next) => {
     try {
@@ -13,19 +13,22 @@ exports.forgotPassword = async (req, res, next) => {
         const user = await User.findOne({ where: { email: email } });
 
         if (user) {
-            // Generate a secure, random token.
             const resetToken = crypto.randomBytes(32).toString('hex');
             
-            // For testing, log the generated token.
-            // In the next step, we will save this to the database.
-            console.log(`User found for email ${email}. Generated token: ${resetToken}`);
+            // Set token and expiry (1 hour from now)
+            user.reset_token = resetToken;
+            user.reset_token_expires_at = new Date(Date.now() + 3600000); // 1 hour in ms
+
+            // Save the updated user record to the database
+            await user.save();
+            
+            console.log(`Token for ${email} saved to database.`);
 
         } else {
             console.log(`Password reset request: No user found for email ${email}`);
         }
         
-        // This response will be updated in a later task.
-        res.status(200).json({ message: 'Token generation process completed.' });
+        res.status(200).json({ message: 'Database update process completed.' });
 
     } catch (error) {
         console.error('Forgot Password Error:', error);
