@@ -48,35 +48,56 @@ exports.forgotPassword = async (req, res, next) => {
         res.status(500).json({ message: 'An internal server error occurred.' });
     }
 };
-// ---resetPassword ---
+
+
 exports.resetPassword = async (req, res, next) => {
     try {
         const { token, password } = req.body;
 
+        // 1. Basic input validation
         if (!token || !password) {
             return res.status(400).json({ message: 'Token and new password are required.' });
         }
 
-        // Find a user with a matching token that has not expired.
+        // 2.password complexity validation
+        if (password.length < 8) {
+            return res.status(400).json({ message: 'Password must be at least 8 characters long.' });
+        }
+        if (!/[A-Z]/.test(password)) {
+            return res.status(400).json({ message: 'Password must include at least one uppercase letter.' });
+        }
+        if (!/[a-z]/.test(password)) {
+            return res.status(400).json({ message: 'Password must include at least one lowercase letter.' });
+        }
+        if (!/[0-9]/.test(password)) {
+            return res.status(400).json({ message: 'Password must include at least one number.' });
+        }
+        if (!/[!@#$%^&*]/.test(password)) {
+            return res.status(400).json({ message: 'Password must include at least one special character (e.g., !@#$%^&*).' });
+        }
+
+        // 3. Find the user by a valid token
         const user = await User.findOne({
             where: {
                 reset_token: token,
-                reset_token_expires_at: {
-                    [Op.gt]: new Date() // Op.gt means "greater than" the current time
-                }
+                reset_token_expires_at: { [Op.gt]: new Date() }
             }
         });
 
-        // If no user is found, the token is invalid or has expired.
+        // 4. Handle invalid token
         if (!user) {
             console.log(`Reset attempt with invalid or expired token: ${token}`);
             return res.status(400).json({ message: 'Token is invalid or has expired.' });
         }
 
-        // For now, if the token is valid, we'll just confirm it.
-        // In the next tasks, we'll add password hashing and saving.
-        console.log(`Valid token received for user: ${user.email}`);
-        res.status(200).json({ message: 'Token is valid.' });
+        // 5. Set the new password 
+        user.password = password;
+        
+        console.log(`New password for ${user.email} has been set and is ready to be saved.`);
+        
+        // 6. Send ONE final response for this task
+        // In the next task, we will replace this with the final logic.
+        res.status(200).json({ message: 'Password has been prepared for update.' });
 
     } catch (error) {
         console.error('Reset Password Error:', error);
