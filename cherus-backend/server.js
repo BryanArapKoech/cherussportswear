@@ -7,6 +7,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const mpesaRoutes = require('./routes/mpesaRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/authRoutes');
+const passwordRoutes = require('./routes/passwordRoutes');
 const helmet = require('helmet'); 
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
@@ -163,6 +164,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/mpesa', mpesaRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/password', passwordRoutes);
 
 // --- Basic Health Check Route ---
 app.get('/', (req, res) => {
