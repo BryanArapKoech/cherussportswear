@@ -7,6 +7,7 @@ const router = express.Router();
 // Route to create a new order and initiate payment (currently only M-Pesa)
 router.post('/create-order', verifyToken, orderController.createOrder);
 
-// Add other order-related routes here later (e.g., GET /orders/:id)
+// GET /api/orders/:orderId/status - Check the status of an order.
+router.get('/:orderId/status', orderController.getOrderStatus);
 
 module.exports = router;

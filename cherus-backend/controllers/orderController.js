@@ -17,6 +17,7 @@ exports.createOrder = async (req, res, next) => {
         //response if the token is missing or invalid.
         return res.status(401).json({ message: 'Authentication required. Please log in.' });
     }
+   
     
     const { cart, shipping, paymentMethod, mpesaPhone } = req.body;
 
@@ -138,4 +139,19 @@ exports.createOrder = async (req, res, next) => {
     console.error('Error creating order:', error);
     next(error); // Pass to error-handling middleware
   }
-}; // 
+}; 
+
+/**
+ * Gets the status of a specific order.
+ * For now, it's a placeholder.
+ */
+exports.getOrderStatus = async (req, res) => {
+    const { orderId } = req.params;
+    console.log(`Status requested for Order ID: ${orderId}`);
+
+    // In this initial task, we return a hardcoded status for testing.
+    res.status(200).json({
+        orderId: orderId,
+        status: 'PENDING' 
+    });
+ };
