@@ -10,8 +10,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       orderId: {
-        type: Sequelize.INTEGER
-      },
+      type: Sequelize.UUID,
+      allowNull: false,
+      references: {
+        model: 'Orders', // The table name
+      key: 'id'
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  },
+
       productId: {
         type: Sequelize.STRING
       },
@@ -24,6 +32,14 @@ module.exports = {
       price: {
         type: Sequelize.DECIMAL
       },
+      size: {
+      type: Sequelize.STRING,
+      allowNull: true // Allow null if product has no size
+    },
+    color: {
+      type: Sequelize.STRING,
+      allowNull: true // Allow null if product has no color
+    },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

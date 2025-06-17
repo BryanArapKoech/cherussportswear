@@ -16,12 +16,11 @@ exports.forgotPassword = async (req, res, next) => {
 
         if (user) {
             const resetToken = crypto.randomBytes(32).toString('hex');
-            
             user.reset_token = resetToken;
-            user.reset_token_expires_at = new Date(Date.now() + 3600000); // 1 hour
+            user.reset_token_expires_at = new Date(Date.now() + 900000); // 15 minutes
 
             await user.save();
-            
+
             // --- START: Email Simulation ---
             // In a real application, you would use a service like Nodemailer or SendGrid here.
             // For now, we construct the link and log it to the console.

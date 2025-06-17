@@ -10,6 +10,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Product.init({
+      sku: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: true // Optional SKU field
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,

@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   OrderItem.init({
     orderId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         references: { // Define foreign key constraint
             model: 'Orders', // Note: Plural table name by default

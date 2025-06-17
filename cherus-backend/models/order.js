@@ -1,61 +1,68 @@
+// models/order.js
 'use strict';
 const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Order extends Model {
     static associate(models) {
-      // An Order BELONGS TO a User
       Order.belongsTo(models.User, {
         foreignKey: 'userId',
         as: 'user'
       });
-      Order.hasMany(models.OrderItem, { // Order has many OrderItems
+      Order.hasMany(models.OrderItem, {
         foreignKey: 'orderId',
-        as: 'items', // Alias to access items via order.items
-        onDelete: 'CASCADE' // Delete items if order is deleted
+        as: 'items',
+        onDelete: 'CASCADE'
       });
     }
   }
   Order.init({
-     userId: {
+    // --- THIS IS THE NEW ID FIELD ---
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
+    },
+    // --- End of new field ---
+    userId: {
       type: DataTypes.INTEGER,
-      allowNull: true, // Allow for guest orders in the future if needed
+      allowNull: true,
       references: {
         model: 'Users',
         key: 'id'
       }
     },
-    customerPhone: { // Store the primary phone used for order
+    customerPhone: {
          type: DataTypes.STRING,
          allowNull: false,
     },
-    customerEmail: DataTypes.STRING, // Store the primary email used for order
-    shippingAddress: { // Store structured shipping details
+    customerEmail: DataTypes.STRING,
+    shippingAddress: {
         type: DataTypes.JSON,
         allowNull: false,
     },
     totalAmount: {
-        type: DataTypes.DECIMAL(10, 2), // Adjust precision as needed
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
     },
-    status: { // e.g., PENDING, PAID, FAILED, SHIPPED, DELIVERED, CANCELLED
+    status: {
         type: DataTypes.STRING,
         allowNull: false,
         defaultValue: 'PENDING',
     },
-    paymentMethod: { // e.g., 'mpesa', 'card', 'paypal'
+    paymentMethod: {
          type: DataTypes.STRING,
          allowNull: false,
     },
-    mpesaCheckoutRequestID: { // To link M-Pesa callback to the order
+    mpesaCheckoutRequestID: {
          type: DataTypes.STRING,
-         unique: true, // Ensure uniqueness
-         allowNull: true, // Null until STK push is initiated
+         unique: true,
+         allowNull: true,
     },
-    mpesaReceiptNumber: { // Store the M-Pesa transaction code on success
+    mpesaReceiptNumber: {
          type: DataTypes.STRING,
          allowNull: true,
     },
-    // to add other fields like shippingCost, discountAmount etc. if needed
   }, {
     sequelize,
     modelName: 'Order',
