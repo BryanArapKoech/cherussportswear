@@ -1,26 +1,43 @@
+// models/index.js
 'use strict';
-// ... other requires (fs, path, Sequelize, basename, env, config) ...
+
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-// Use the specific config object, not the whole file directly
-const config = require(__dirname + '/../config/database.js')[env];
+require('dotenv').config(); // Ensure .env variables are loaded
+
 const db = {};
 
 let sequelize;
-// Handle production DATABASE_URL or local config
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+// The application will use this block to connect to the database
+if (process.env.DB_NAME && process.env.DB_USER && process.env.DB_HOST) {
+  sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASSWORD,
+    {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      dialect: process.env.DB_DIALECT || 'postgres',
+      logging: false, // Set to console.log to see DB queries
+    }
+  );
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  console.error("Database connection variables are not set in .env file. Please check your configuration.");
+  process.exit(1);
 }
+
 
 fs
   .readdirSync(__dirname)
   .filter(file => {
-    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+    return (
+      file.indexOf('.') !== 0 &&
+      file !== basename &&
+      file.slice(-3) === '.js' &&
+      file.indexOf('.test.js') === -1
+    );
   })
   .forEach(file => {
     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
@@ -29,7 +46,7 @@ fs
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
-    db[modelName].associate(db); // <-- Ensure this line is present
+    db[modelName].associate(db);
   }
 });
 

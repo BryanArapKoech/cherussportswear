@@ -1,5 +1,5 @@
 const axios = require('axios');
-const moment = require('moment'); // Or use native Date + formatting
+const moment = require('moment');
 require('dotenv').config();
 
 const MPESA_ENVIRONMENT = process.env.MPESA_ENVIRONMENT || 'sandbox';
@@ -7,23 +7,20 @@ const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY;
 const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET;
 const MPESA_SHORTCODE = process.env.MPESA_SHORTCODE;
 const MPESA_LIPA_NA_MPESA_ONLINE_PASSKEY = process.env.MPESA_LIPA_NA_MPESA_ONLINE_PASSKEY;
-const MPESA_CALLBACK_URL = process.env.MPESA_CALLBACK_URL; // Ensure this is correctly set in .env
+const MPESA_CALLBACK_URL = process.env.MPESA_CALLBACK_URL;
 
-// Determine API URLs based on environment
 const MPESA_BASE_URL = MPESA_ENVIRONMENT === 'live'
     ? 'https://api.safaricom.co.ke'
     : 'https://sandbox.safaricom.co.ke';
 
 const MPESA_AUTH_URL = `${MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials`;
 const MPESA_STK_PUSH_URL = `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`;
-// Add other URLs like query status if needed
 
 let mpesaToken = {
     value: null,
     expiresAt: null,
 };
 
-// Function to get M-Pesa Auth Token (with basic caching)
 const getAuthToken = async () => {
     if (mpesaToken.value && mpesaToken.expiresAt && mpesaToken.expiresAt > Date.now()) {
         console.log('Using cached M-Pesa token');
@@ -35,15 +32,12 @@ const getAuthToken = async () => {
 
     try {
         const response = await axios.get(MPESA_AUTH_URL, {
-            headers: {
-                'Authorization': `Basic ${auth}`
-            }
+            headers: { 'Authorization': `Basic ${auth}` }
         });
 
-        const expiresIn = response.data.expires_in; // typically 3599 seconds
+        const expiresIn = response.data.expires_in;
         mpesaToken = {
             value: response.data.access_token,
-            // Set expiry slightly before actual expiry (e.g., 5 mins buffer)
             expiresAt: Date.now() + (expiresIn - 300) * 1000
         };
         console.log('New M-Pesa token obtained');
@@ -55,20 +49,24 @@ const getAuthToken = async () => {
     }
 };
 
-// Function to initiate STK Push
 const initiateSTKPush = async ({ amount, phoneNumber, orderId }) => {
     if (!MPESA_CALLBACK_URL) {
         throw new Error('MPESA_CALLBACK_URL is not defined in environment variables.');
     }
     if (!MPESA_SHORTCODE || !MPESA_LIPA_NA_MPESA_ONLINE_PASSKEY) {
-         throw new Error('M-Pesa Shortcode or Passkey not defined.');
+        throw new Error('M-Pesa Shortcode or Passkey not defined.');
     }
 
+    // ---LOGIC ---
+    let formattedPhone = phoneNumber.trim();
+    if (formattedPhone.startsWith('+')) {
+        formattedPhone = formattedPhone.substring(1);
+    } else if (formattedPhone.startsWith('0')) {
+        formattedPhone = '254' + formattedPhone.substring(1);
+    }
+    // ---FIX ---
 
-    // Format phone number to Safaricom standard (254xxxxxxxxx)
-    const formattedPhone = phoneNumber.replace(/^\+|^0/, '254');
-
-    const token = await getAuthToken(); // Ensure we have a valid token
+    const token = await getAuthToken();
     const timestamp = moment().format('YYYYMMDDHHmmss');
     const password = Buffer.from(`${MPESA_SHORTCODE}${MPESA_LIPA_NA_MPESA_ONLINE_PASSKEY}${timestamp}`).toString('base64');
 
@@ -76,14 +74,14 @@ const initiateSTKPush = async ({ amount, phoneNumber, orderId }) => {
         BusinessShortCode: MPESA_SHORTCODE,
         Password: password,
         Timestamp: timestamp,
-        TransactionType: 'CustomerPayBillOnline', // Or 'CustomerBuyGoodsOnline'
-        Amount: Math.round(amount), // M-Pesa requires integer amount
-        PartyA: formattedPhone, // Customer's phone number
-        PartyB: MPESA_SHORTCODE, // Your Paybill or Till Number
-        PhoneNumber: formattedPhone, // Customer's phone number
+        TransactionType: 'CustomerPayBillOnline',
+        Amount: Math.round(amount),
+        PartyA: formattedPhone,
+        PartyB: MPESA_SHORTCODE,
+        PhoneNumber: formattedPhone,
         CallBackURL: MPESA_CALLBACK_URL,
-        AccountReference: `CHERUS-${orderId}`, // Max 12 chars alphanumeric. Use Order ID. IMPORTANT for matching callback.
-        TransactionDesc: `Payment for Order ${orderId}` // Description shown to customer
+        AccountReference: `CHERUS-${orderId}`,
+        TransactionDesc: `Payment for Order ${orderId}`
     };
 
     console.log('Initiating STK Push with payload:', payload);
@@ -98,30 +96,24 @@ const initiateSTKPush = async ({ amount, phoneNumber, orderId }) => {
 
         console.log('M-Pesa STK Push Response:', response.data);
 
-        // Check if the request was accepted by M-Pesa (ResponseCode 0)
         if (response.data && response.data.ResponseCode === '0') {
-             // IMPORTANT: This only means M-Pesa *accepted* the request, not that payment is complete.
-             // Payment completion comes via the callback.
-             return {
+            return {
                 success: true,
                 merchantRequestID: response.data.MerchantRequestID,
-                checkoutRequestID: response.data.CheckoutRequestID, // This ID is crucial!
+                checkoutRequestID: response.data.CheckoutRequestID,
                 responseDescription: response.data.ResponseDescription,
             };
         } else {
-            // Request initiation failed
             throw new Error(response.data.ResponseDescription || response.data.errorMessage || 'Failed to initiate M-Pesa STK push.');
         }
 
     } catch (error) {
-        console.error('Error initiating M-Pesa STK Push:', error.response ? JSON.stringify(error.response.data) : error.message);
-         // Provide a more user-friendly error if possible based on M-Pesa response
         const errorMessage = error.response?.data?.errorMessage || error.message || 'An error occurred during M-Pesa request.';
+        console.error('Error initiating M-Pesa STK Push:', error.response ? JSON.stringify(error.response.data) : errorMessage);
         throw new Error(`M-Pesa STK Push failed: ${errorMessage}`);
     }
 };
 
 module.exports = {
     initiateSTKPush
-    // Add queryStatus function here if needed later
 };

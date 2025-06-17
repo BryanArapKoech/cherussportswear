@@ -179,14 +179,14 @@ app.use(errorHandler);
 const startServer = async () => {
     try {
         // Authenticate database connection
-        await db.sequelize.authenticate();
-        console.log('Database connection has been established successfully.');
+        // await db.sequelize.authenticate();
+        // console.log('Database connection has been established successfully.');
 
         
         
         if (process.env.NODE_ENV === 'development') {
-             // await db.sequelize.sync({ alter: true }); 
-             // console.log('Database synchronized (alter).');
+            // await db.sequelize.sync({ alter: true }); 
+            // console.log('Database synchronized (alter).');
              
         }
 

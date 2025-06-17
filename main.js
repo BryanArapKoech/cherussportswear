@@ -234,7 +234,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const colorsHtml = Array.isArray(colorsData) ? colorsData.map(color =>
                 `<span style="background-color: ${color.code || '#ccc'}; border: ${(color.code?.toLowerCase() === '#ffffff' || color.code?.toLowerCase() === 'white') ? '1px solid #ccc' : 'none'}" title="${color.name}" class="color-swatch"></span>`
             ).join('') : '';
-            const imageUrl = product.imageUrl || './assets/placeholder-image.svg';
+            
+
+                       
+            let imageUrl = product.imageUrl || 'assets/placeholder-image.svg';
+            
+            // Standardize the path by removing any leading './'
+            if (imageUrl.startsWith('./')) {
+             imageUrl = imageUrl.substring(2);
+                }
 
             const cardHtml = `
                 <div class="col">

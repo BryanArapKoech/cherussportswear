@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // --- Get all DOM Elements ---
+    const BACKEND_URL = 'http://localhost:3000';
     const shippingDetailsReview = document.getElementById('shippingDetailsReview');
     const summaryItemsList = document.getElementById('summaryItemsList');
     const summarySubtotal = document.getElementById('summarySubtotal');
@@ -68,61 +69,69 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // --- 3. Handle the final order submission ---
     paymentForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        
-        const mpesaPhone = document.getElementById('mpesaPhone').value;
-        if (!mpesaPhone) {
-            paymentError.textContent = 'Please enter your M-Pesa phone number.';
-            paymentError.style.display = 'block';
-            return;
+    event.preventDefault();
+    
+    const mpesaPhone = document.getElementById('mpesaPhone').value;
+    if (!mpesaPhone) {
+        paymentError.textContent = 'Please enter your M-Pesa phone number.';
+        paymentError.style.display = 'block';
+        return;
+    }
+
+    placeOrderBtn.disabled = true;
+    placeOrderBtnSpinner.style.display = 'inline-block';
+    paymentError.style.display = 'none';
+
+    const orderData = {
+        cart: cart,
+        shipping: shippingDetails,
+        paymentMethod: 'mpesa',
+        mpesaPhone: mpesaPhone
+    };
+    
+    let response; // Define response here to access it in the catch block
+    try {
+        response = await fetch(`${BACKEND_URL}/api/orders/create-order`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            // This makes sure that even if the server returns a 4xx or 5xx error,
+            // we treat it as an error and jump to the catch block.
+            throw new Error(result.message || `HTTP error! status: ${response.status}`);
         }
-
-        // Disable button and show spinner
-        placeOrderBtn.disabled = true;
-        placeOrderBtnSpinner.style.display = 'inline-block';
-        paymentError.style.display = 'none';
-
-        const orderData = {
-            cart: cart,
-            shipping: shippingDetails,
-            paymentMethod: 'mpesa',
-            mpesaPhone: mpesaPhone
-        };
         
-        try {
-            const response = await fetch(`${BACKEND_URL}/api/create-order`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // THE AUTHENTICATED API CALL
-                },
-                body: JSON.stringify(orderData)
-            });
+        // --- SUCCESS ---
+        localStorage.removeItem('shoppingCart');
+        localStorage.removeItem('shippingDetails');
+        updateCartBadge();
+        window.location.href = `thank-you.html?orderId=${result.orderId}&method=mpesa`;
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                // If API returns an error (like 401, 400, 500)
-                throw new Error(result.message || 'An unknown error occurred.');
-            }
+    } catch (error) {
+        // Check if the error is from a 401 Unauthorized response
+        if (response && response.status === 401) {
+            localStorage.removeItem('authToken'); // Clear the expired token
+            localStorage.removeItem('shippingDetails'); // Also clear stale data
             
-            // --- SUCCESS ---
-            // Clear cart and shipping details from storage
-            localStorage.removeItem('shoppingCart');
-            localStorage.removeItem('shippingDetails');
-            updateCartBadge(); // Update badge to 0
-
-        // Redirect to the thank-you page, passing the orderId and method as URL parameters
-            window.location.href = `thank-you.html?orderId=${result.orderId}&method=mpesa`;
-           
-
-        } catch (error) {
+            // Inform the user and redirect to the login page
+            alert('Your session has expired. Please log in again to continue.');
+            window.location.href = 'login.html';
+        } else {
+            // Handle all other errors (network issues, validation errors, etc.)
             paymentError.textContent = error.message;
             paymentError.style.display = 'block';
             placeOrderBtn.disabled = false;
             placeOrderBtnSpinner.style.display = 'none';
         }
-    });
+    }
+});
 
     // --- Initial Page Load ---
     renderPage();

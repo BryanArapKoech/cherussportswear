@@ -8,6 +8,6 @@ const router = express.Router();
 router.post('/create-order', verifyToken, orderController.createOrder);
 
 // GET /api/orders/:orderId/status - Check the status of an order.
-router.get('/:orderId/status', orderController.getOrderStatus);
+router.get('/:orderId/status', verifyToken, orderController.getOrderStatus);
 
 module.exports = router;
