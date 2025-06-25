@@ -132,6 +132,11 @@
                                         You will receive a push notification on this phone to enter your PIN.
                                     </div>
                                 </div>
+                                <div id="payment-processing" style="display: none;" class="text-center p-4">
+    <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;" role="status"></div>
+    <p class="mt-3">Awaiting M-Pesa payment confirmation...</p>
+    <p class="text-muted">Please approve the transaction on your phone.</p>
+</div>
                                 <div id="paymentError" class="alert alert-danger" style="display: none;"></div>
                                 <button type="submit" id="placeOrderBtn" class="w-100 btn btn-warning btn-lg">
                                     <span id="placeOrderBtnSpinner" class="spinner-border spinner-border-sm" role="status" style="display: none;"></span>

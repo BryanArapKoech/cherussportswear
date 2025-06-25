@@ -311,11 +311,12 @@ transform: translateY(-8.5px) rotate(-45deg);
     }
     
     .dropdown__link, .dropdown__sublink {
-        color: #fff;
+        color: #212121;
     }
     
     .dropdown__link:hover, .dropdown__sublink:hover {
-        background-color: #34495e;
+        background-color: #f1f1f1; /* Light grey hover background */
+        color: #3498db; /* Blue for hover text */
     }
 }
 

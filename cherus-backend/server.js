@@ -1,7 +1,12 @@
+// File: server.js
+// This file sets up the Express server, connects to the database, and configures routes and middleware.
+
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const db = require('./models'); 
+const { sendEmail } = require('./services/emailService');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const mpesaRoutes = require('./routes/mpesaRoutes');
@@ -181,8 +186,7 @@ const startServer = async () => {
         // Authenticate database connection
         // await db.sequelize.authenticate();
         // console.log('Database connection has been established successfully.');
-
-        
+       
         
         if (process.env.NODE_ENV === 'development') {
             // await db.sequelize.sync({ alter: true }); 

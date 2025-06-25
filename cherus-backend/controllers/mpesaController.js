@@ -1,4 +1,5 @@
 const { Order } = require('../models'); // Import Order model
+const { sendEmail } = require('../services/emailService');
 
 // Controller for handling the M-Pesa STK Push Callback
 exports.handleStkCallback = async (req, res, next) => {
@@ -77,7 +78,17 @@ exports.handleStkCallback = async (req, res, next) => {
             await order.save();
             console.log(`Order ${order.id} status updated to '${order.status}'`);
 
-            // TODO: Trigger other post-payment actions (e.g., send confirmation email, notify fulfillment)
+            // --- Send Confirmation Email ---
+            
+        if (order.status === 'PAID') {
+            await sendEmail({
+                to: order.customerEmail,
+                subject: `Order Confirmation - #${order.id}`,
+                text: `Hi, thank you for your order! Your payment for order #${order.id} was successful. Your M-Pesa receipt number is ${mpesaReceipt}.`,
+                html: `<h3>Thank you for your order!</h3><p>Your payment for order <strong>#${order.id}</strong> was successful.</p><p>M-Pesa Receipt: <strong>${mpesaReceipt}</strong></p>`
+        });
+    }
+            // --- End of Email ---
 
         } else {
             // --- Payment Failed or Cancelled ---
@@ -86,6 +97,15 @@ exports.handleStkCallback = async (req, res, next) => {
             // Optionally store resultDesc in a separate field
             await order.save();
             console.log(`Order ${order.id} status updated to 'FAILED'`);
+
+            // --- Send Failure Email ---
+        await sendEmail({
+            to: order.customerEmail,
+            subject: `Payment Issue with Order #${order.id}`,
+            text: `Hi, there was an issue with your M-Pesa payment for order #${order.id}. Reason: ${resultDesc}. Please try placing the order again or contact support.`,
+            html: `<h3>Payment Issue with your Order #${order.id}</h3><p>Unfortunately, your M-Pesa payment could not be completed.</p><p>Reason: <strong>${resultDesc}</strong></p><p>Please try placing the order again or contact our support team for assistance.</p>`
+    });
+            // --- End of Email ---
         }
 
         // --- Acknowledge Callback to M-Pesa ---
@@ -101,7 +121,7 @@ exports.handleStkCallback = async (req, res, next) => {
     }
 };
 
-// Optional: Controller for Querying Status (if needed)
+// Controller for Querying Status 
 exports.queryStkStatus = async (req, res, next) => {
     // Implementation would involve calling an mpesaService.queryTransactionStatus function
     // and returning the result. Needs CheckoutRequestID.
