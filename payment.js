@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function() {
     // --- Get all DOM Elements ---
     const BACKEND_URL = 'http://localhost:3000';
@@ -10,33 +11,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const placeOrderBtn = document.getElementById('placeOrderBtn');
     const paymentError = document.getElementById('paymentError');
     const placeOrderBtnSpinner = document.getElementById('placeOrderBtnSpinner');
-    const loaderOverlay = document.getElementById('loader-overlay');
-    const paymentContent = document.getElementById('payment-content');
-
+    const loaderOverlay = document.getElementById('loader-overlay'); // Assuming this exists for loading
+    
     // --- 1. Load data and validate session ---
     const token = localStorage.getItem('authToken');
     const shippingDetails = JSON.parse(localStorage.getItem('shippingDetails'));
-    const cart = getCart();
+    const cart = getCart(); // Assumes getCart() is globally available from another script
 
-    if (!token) {
-        alert("Authentication error. Redirecting to login.");
-        window.location.href = 'login.html';
-        return;
-    }
-    if (!shippingDetails) {
-        alert("Shipping details not found. Please complete the shipping step.");
-        window.location.href = 'shipping.html';
-        return;
-    }
-    if (cart.length === 0) {
-        alert("Your cart is empty.");
+    if (!token || !shippingDetails || cart.length === 0) {
+        alert("There was an issue with your session or cart. Redirecting home.");
         window.location.href = 'index.html';
         return;
     }
 
     // --- 2. Render the page with the loaded data ---
     function renderPage() {
-        // Render shipping details
         shippingDetailsReview.innerHTML = `
             <strong>${shippingDetails.firstName} ${shippingDetails.lastName}</strong><br>
             ${shippingDetails.address}, ${shippingDetails.city}<br>
@@ -44,18 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
             ${shippingDetails.phone}
         `;
 
-        // Render order summary
-        summaryItemsList.innerHTML = '';
         let subtotal = 0;
+        summaryItemsList.innerHTML = '';
         cart.forEach(item => {
             const itemTotal = item.price * item.quantity;
             subtotal += itemTotal;
             const li = document.createElement('li');
             li.className = 'list-group-item d-flex justify-content-between';
-            li.innerHTML = `
-                <span>${item.name} (x${item.quantity})</span>
-                <strong>${formatPrice(itemTotal)}</strong>
-            `;
+            li.innerHTML = `<span>${item.name} (x${item.quantity})</span><strong>${formatPrice(itemTotal)}</strong>`;
             summaryItemsList.appendChild(li);
         });
 
@@ -69,70 +54,90 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // --- 3. Handle the final order submission ---
     paymentForm.addEventListener('submit', async function(event) {
-    event.preventDefault();
-    
-    const mpesaPhone = document.getElementById('mpesaPhone').value;
-    if (!mpesaPhone) {
-        paymentError.textContent = 'Please enter your M-Pesa phone number.';
-        paymentError.style.display = 'block';
-        return;
-    }
-
-    placeOrderBtn.disabled = true;
-    placeOrderBtnSpinner.style.display = 'inline-block';
-    paymentError.style.display = 'none';
-
-    const orderData = {
-        cart: cart,
-        shipping: shippingDetails,
-        paymentMethod: 'mpesa',
-        mpesaPhone: mpesaPhone
-    };
-    
-    let response; // Define response here to access it in the catch block
-    try {
-        response = await fetch(`${BACKEND_URL}/api/orders/create-order`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-            // This makes sure that even if the server returns a 4xx or 5xx error,
-            // we treat it as an error and jump to the catch block.
-            throw new Error(result.message || `HTTP error! status: ${response.status}`);
-        }
+        event.preventDefault();
         
-        // --- SUCCESS ---
-        localStorage.removeItem('shoppingCart');
-        localStorage.removeItem('shippingDetails');
-        updateCartBadge();
-        window.location.href = `thank-you.html?orderId=${result.orderId}&method=mpesa`;
+        const mpesaPhone = document.getElementById('mpesaPhone').value;
+        if (!mpesaPhone) {
+            paymentError.textContent = 'Please enter your M-Pesa phone number.';
+            paymentError.style.display = 'block';
+            return;
+        }
+
+        placeOrderBtn.disabled = true;
+        placeOrderBtnSpinner.style.display = 'inline-block';
+        paymentError.style.display = 'none';
+        if (loaderOverlay) loaderOverlay.style.display = 'flex'; // Show full page loader
+
+        const orderData = {
+            cart: cart,
+            shipping: shippingDetails,
+            paymentMethod: 'mpesa',
+            mpesaPhone: mpesaPhone
+        };
+        
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/orders/create-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(orderData)
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Failed to create order.');
+            
+            // --- POLLING LOGIC---
+            document.getElementById('payment-content').style.display = 'none';
+
+        // Show and populate the polling status message
+        const pollingContainer = document.getElementById('polling-status-container');
+        pollingContainer.style.display = 'block';
+        pollingContainer.innerHTML = `
+            <div class="alert alert-info">
+                <div class="spinner-border my-3" role="status"></div>
+                <h4>STK Push Sent</h4>
+                <p>Please check your phone and enter your M-Pesa PIN to complete the payment.</p>
+                <p><em>This page will automatically update once the payment is confirmed.</em></p>
+            </div>
+        `;
+        
+        const orderId = result.orderId;
+        const poller = setInterval(async () => {
+            try {
+                const statusResponse = await fetch(`${BACKEND_URL}/api/orders/${orderId}/status`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (statusResponse.ok) {
+                    const statusData = await statusResponse.json();
+                    if (statusData.status === 'PAID') {
+                        clearInterval(poller);
+                        window.location.href = `thank-you.html?orderId=${orderId}&status=success`;
+                    } else if (statusData.status !== 'PENDING') {
+                        clearInterval(poller);
+                        window.location.href = `thank-you.html?orderId=${orderId}&status=failed&reason=${statusData.status}`;
+                    }
+                }
+            } catch (pollError) {
+                console.error("Polling error:", pollError);
+                clearInterval(poller);
+                pollingContainer.innerHTML = `<div class="alert alert-danger">Could not confirm payment status. Please check your email for confirmation or contact support.</div>`;
+            }
+        }, 5000);
+
+        setTimeout(() => {
+            if (pollingContainer.style.display === 'block') {
+                 clearInterval(poller);
+                 pollingContainer.innerHTML = `<div class="alert alert-warning">Payment confirmation timed out. Please check your email or contact support to verify your order status.</div>`;
+            }
+        }, 60000);
 
     } catch (error) {
-        // Check if the error is from a 401 Unauthorized response
-        if (response && response.status === 401) {
-            localStorage.removeItem('authToken'); // Clear the expired token
-            localStorage.removeItem('shippingDetails'); // Also clear stale data
-            
-            // Inform the user and redirect to the login page
-            alert('Your session has expired. Please log in again to continue.');
-            window.location.href = 'login.html';
-        } else {
-            // Handle all other errors (network issues, validation errors, etc.)
-            paymentError.textContent = error.message;
-            paymentError.style.display = 'block';
-            placeOrderBtn.disabled = false;
-            placeOrderBtnSpinner.style.display = 'none';
-        }
+        paymentError.textContent = error.message;
+        paymentError.style.display = 'block';
+        placeOrderBtn.disabled = false;
+        placeOrderBtnSpinner.style.display = 'none';
     }
-});
-
+    });
     // --- Initial Page Load ---
     renderPage();
 });

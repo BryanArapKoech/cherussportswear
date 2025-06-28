@@ -55,7 +55,7 @@ exports.resetPassword = async (req, res, next) => {
 
         // 1. Basic input validation
         if (!token || !password) {
-            return res.status(400).json({ message: 'Token and new password are required.' });
+            return res.status(400).json({ message: 'New password are required.' });
         }
 
         // 2.password complexity validation
