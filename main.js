@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let isLoadingMore = false;
     let totalPages = 1;
     let currentFetchedProducts = []; // Store fetched products for quick view/add to cart
+    let newestOfferProducts = []; // Array to hold products for the slider
+    let currentOfferIndex = 0; // Current index for the slider
+    let offerIntervalId; // To hold the interval ID
 
     const BACKEND_URL = 'http://localhost:3000'; // Make sure this matches your backend
 
@@ -438,6 +441,92 @@ document.addEventListener('DOMContentLoaded', function() {
             let currentValue = parseInt(quantityInput.value);
             quantityInput.value = currentValue + 1;
         });
+
+        
+    }
+        // --- Offer Slideshow Functions ---
+    function displayOfferProduct() {
+        if (newestOfferProducts.length === 0) return;
+
+        const offerContainer = document.getElementById('newProductOfferContent');
+        if (!offerContainer) return;
+
+        // Cycle to the next product
+        currentOfferIndex = (currentOfferIndex + 1) % newestOfferProducts.length;
+        const product = newestOfferProducts[currentOfferIndex];
+        
+        // Add product to global fetched list if not present, so addToCart works
+        if (!currentFetchedProducts.find(p => p.id == product.id)) {
+            currentFetchedProducts.push(product);
+        }
+
+        let imageUrl = product.imageUrl || 'assets/placeholder-image.svg';
+        if (imageUrl.startsWith('./')) {
+            imageUrl = imageUrl.substring(2);
+        }
+
+        const offerHtml = `
+            <div class="col-md-6 text-center">
+                <img src="${imageUrl}" class="img-fluid" alt="${product.name}" style="max-height: 400px; object-fit: contain;">
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+                <div>
+                    <p class="text-muted">Our Newest Product Offer</p>
+                    <h1>${product.name}</h1>
+                    <small>${product.description || 'A great new addition to our collection.'}</small>
+                    <br>
+                    <button type="button" class="btn btn-warning mt-3 add-to-cart-static" data-product-id="${product.id}">Add to Cart</button>
+                </div>
+            </div>
+        `;
+
+        // Fade out, update content, then fade in
+        offerContainer.style.opacity = 0;
+
+        setTimeout(() => {
+            offerContainer.innerHTML = offerHtml;
+            offerContainer.style.opacity = 1;
+
+            // Re-attach listener to the newly created button
+            const newButton = offerContainer.querySelector('.add-to-cart-static');
+            if (newButton) {
+                newButton.addEventListener('click', handleAddToCartGridStaticClick);
+            }
+        }, 500); // This duration should match the CSS transition time
+    }
+
+    async function initializeNewestProductOffer() {
+        const offerContainer = document.getElementById('newProductOfferContent');
+        if (!offerContainer) return;
+
+        console.log("Fetching newest products for offer slideshow...");
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/products?sort=newest&limit=5`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+
+            if (data.products && data.products.length > 0) {
+                // Filter out products without a valid image URL
+                newestOfferProducts = data.products.filter(p => p.imageUrl && p.imageUrl.trim() !== '');
+
+                if (newestOfferProducts.length > 0) {
+                    currentOfferIndex = -1; // Start at -1 so the first call shows index 0
+                    displayOfferProduct(); // Show the first product immediately
+                    
+                    if (newestOfferProducts.length > 1) {
+                       if (offerIntervalId) clearInterval(offerIntervalId); // Clear previous interval if any
+                       offerIntervalId = setInterval(displayOfferProduct, 10000); // 10-second interval
+                    }
+                } else {
+                     offerContainer.innerHTML = '<div class="col-12"><p>No new offers with images available.</p></div>';
+                }
+            } else {
+                offerContainer.innerHTML = '<div class="col-12"><p>Could not load newest offers at this time.</p></div>';
+            }
+        } catch (error) {
+            console.error("Error initializing newest product offer:", error);
+            offerContainer.innerHTML = `<div class="col-12 text-danger"><p>Error loading offers: ${error.message}</p></div>`;
+        }
     }
 
     // --- Filtering / Sorting / Pagination Setup ---
@@ -567,11 +656,20 @@ document.addEventListener('DOMContentLoaded', function() {
             await fetchAndDisplayProducts(currentPage, currentCategory, currentSort, currentSearch, false);
         }
 
+        
         const isHomePage = !params.category && !params.subcategory && !params.search;
         if (bannerSection) bannerSection.style.display = isHomePage ? 'flex' : 'none';
         if (bannerHr) bannerHr.style.display = isHomePage ? 'block' : 'none';
-        if (newProductSection) newProductSection.style.display = isHomePage ? 'flex' : 'none';
-        if (newProductHr) newProductHr.style.display = isHomePage ? 'block' : 'none';
+        if (newProductSection && newProductHr) {
+            if (isHomePage) {
+                newProductSection.style.display = 'block';
+                newProductHr.style.display = 'block';
+                initializeNewestProductOffer();
+            } else {
+                newProductSection.style.display = 'none';
+                newProductHr.style.display = 'none';
+            }
+        }
 
         // Always setup these as they might be on all pages with main.js
         setupHamburger();
@@ -582,13 +680,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setupFiltersAndSorting();
         }
 
-        const staticNewProductSection = document.querySelector('.new-product-section');
-        if (staticNewProductSection) {
-            attachProductEventListeners(staticNewProductSection);
-        } else {
-            // This warning is fine if .new-product-section is not on every page
-            // console.warn(".new-product-section not found. Listeners for static products not attached.");
-        }
+        
 
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
