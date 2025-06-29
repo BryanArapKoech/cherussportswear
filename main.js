@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log("Fetching newest products for offer slideshow...");
         try {
-            const response = await fetch(`${BACKEND_URL}/api/products?sort=newest&limit=5`);
+            const response = await fetch(`${BACKEND_URL}/api/products?sort=newest&limit=12`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
 
