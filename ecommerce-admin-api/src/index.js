@@ -5,7 +5,9 @@ const express = require('express');
 
 const authRoutes = require('./api/auth');
 const adminRoutes = require('./api/admin');
+const productRoutes = require('./api/products');
 const authenticate = require('./middleware/authenticate');
+const authorize = require('./middleware/authorize');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,6 +20,10 @@ app.use('/api/auth', authRoutes);
 
 // Protected Routes
 app.use('/api/admin', authenticate, adminRoutes);
+
+// RBAC Protected Route for Products
+// A user must be authenticated AND have the 'write:products' permission
+app.use('/api/products', authenticate, authorize('write:products'), productRoutes);
 
 app.get('/', (req, res) => {
   res.send('Admin API is running!');
