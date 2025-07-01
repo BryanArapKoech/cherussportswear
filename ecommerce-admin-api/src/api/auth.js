@@ -23,6 +23,20 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' }); // User not found
     }
 
+
+    
+
+
+// --- LOGS FOR VALIDATION ---
+    console.log('--- Password Comparison Details ---');
+    console.log('Password from Request:', `'${password}'`);
+    console.log('Hashed Password from DB:', `'${admin.password_hash}'`);
+    console.log('---------------------------------');
+    // --- END OF LOGS ---
+
+
+
+
     // Compare password
     const isMatch = await comparePassword(password, admin.password_hash);
     if (!isMatch) {
