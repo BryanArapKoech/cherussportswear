@@ -8,6 +8,8 @@ const router = express.Router();
 const authorize = require('../middleware/authorize');
 const { hashPassword } = require('../utils/password');
 
+const { adminCreationRules, validate } = require('../middleware/validators');
+
 // Get the logged-in user's own profile
 router.get('/profile/me', async (req, res) => {
   try {
@@ -29,12 +31,11 @@ router.get('/profile/me', async (req, res) => {
 
 // --- Admin Management Routes ---
 // 1. Create a new admin user
-router.post('/users', authorize('create:admins'), async (req, res) => {
+router.post('/users', authorize('create:admins'), adminCreationRules(), validate,
+async (req, res) => {
   try {
     const { email, password, role_id } = req.body;
-    if (!email || !password || !role_id) {
-      return res.status(400).json({ message: 'Email, password, and role_id are required' });
-    }
+    
     const hashedPassword = await hashPassword(password);
     const { rows } = await db.query(
       'INSERT INTO admins (email, password_hash, role_id) VALUES ($1, $2, $3) RETURNING id, email, role_id, created_at',
@@ -42,7 +43,13 @@ router.post('/users', authorize('create:admins'), async (req, res) => {
     );
     res.status(201).json(rows[0]);
   } catch (error) {
-    if (error.code === '23505') return res.status(409).json({ message: 'Email already exists' });
+    if (error.code === '23505') { 
+      return res.status(409).json({ message: 'Email already exists' });
+    }
+    if (error.code === '23503') {
+      return res.status(400).json({ message: 'Invalid role_id' });
+    }
+    console.error("Create admin error:", error);
     res.status(500).json({ message: 'Server error' });
   }
 });
