@@ -9,12 +9,18 @@ const mfaRoutes = require('./api/mfa');
 const productRoutes = require('./api/products');
 const authenticate = require('./middleware/authenticate');
 const authorize = require('./middleware/authorize');
+const ipFilter = require('./middleware/ipFilter');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
+// Trust proxy headers to get the correct client IP address
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(express.json()); // To parse JSON request bodies
+app.use(ipFilter); 
 
 // Public Routes
 app.use('/api/auth', authRoutes);
