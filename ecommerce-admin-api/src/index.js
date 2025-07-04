@@ -2,6 +2,7 @@
 
 require('dotenv').config();
 const express = require('express');
+const helmet = require('helmet');
 
 const authRoutes = require('./api/auth');
 const adminRoutes = require('./api/admin');
@@ -19,6 +20,7 @@ const PORT = process.env.PORT || 3001;
 app.set('trust proxy', 1);
 
 // Middlewares
+app.use(helmet());
 app.use(express.json()); // To parse JSON request bodies
 app.use(ipFilter); 
 
