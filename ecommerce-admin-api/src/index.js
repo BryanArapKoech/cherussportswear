@@ -16,6 +16,8 @@ const orderRoutes = require('./api/orders');
 const settingsRoutes = require('./api/settings');
 const analyticsRoutes = require('./api/analytics');
 const contentRoutes = require('./api/content');
+const errorHandler = require('./middleware/errorHandler');
+const db = require('./config/database');
 
 
 const app = express();
@@ -46,9 +48,22 @@ app.use('/api/content', authenticate, contentRoutes);
 
 
 
+app.get('/health', async (req, res) => {
+  try {
+    // Check database connection by running a simple query
+    await db.query('SELECT 1');
+    res.status(200).json({ status: 'ok', database: 'connected' });
+  } catch (error) {
+    res.status(503).json({ status: 'error', database: 'disconnected' });
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('Admin API is running!');
 });
+
+// Error Handling Middleware
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
