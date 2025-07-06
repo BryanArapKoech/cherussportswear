@@ -20,5 +20,5 @@ INSERT INTO settings (key, value, description) VALUES
 
 -- Add the required permission to the super_admin role
 UPDATE roles
-SET permissions = '{"permissions": ["*", "read:settings", "write:settings"]}'
+SET permissions = '{"permissions": ["*", "read:settings", "write:settings", "read:analytics"]}'
 WHERE name = 'super_admin';
