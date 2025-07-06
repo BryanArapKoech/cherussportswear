@@ -11,6 +11,9 @@ const productRoutes = require('./api/products');
 const authenticate = require('./middleware/authenticate');
 const authorize = require('./middleware/authorize');
 const ipFilter = require('./middleware/ipFilter');
+const customerRoutes = require('./api/customers');
+const orderRoutes = require('./api/orders');
+
 
 
 const app = express();
@@ -32,6 +35,9 @@ app.use('/api/auth', authRoutes);
 // Protected Routes
 app.use('/api/admin', authenticate, adminRoutes);
 app.use('/api/mfa', authenticate, mfaRoutes);
+app.use('/api/products', authenticate, productRoutes);
+app.use('/api/customer', authenticate, customerRoutes);
+app.use('/api/orders', authenticate, orderRoutes);
 
 // RBAC Protected Route for Products
 // A user must be authenticated AND have the 'write:products' permission
