@@ -23,6 +23,7 @@ app.set('trust proxy', 1);
 // Middlewares
 app.use(helmet());
 app.use(express.json()); // To parse JSON request bodies
+app.use(express.static('public')); // Serve static files from the public directory
 app.use(ipFilter); 
 
 // Public Routes
