@@ -15,6 +15,7 @@ const customerRoutes = require('./api/customers');
 const orderRoutes = require('./api/orders');
 const settingsRoutes = require('./api/settings');
 const analyticsRoutes = require('./api/analytics');
+const contentRoutes = require('./api/content');
 
 
 const app = express();
@@ -41,6 +42,7 @@ app.use('/api/customers', authenticate, customerRoutes);
 app.use('/api/orders', authenticate, orderRoutes);
 app.use('/api/settings', authenticate, settingsRoutes);
 app.use('/api/analytics', authenticate, analyticsRoutes);
+app.use('/api/content', authenticate, contentRoutes); 
 
 
 
