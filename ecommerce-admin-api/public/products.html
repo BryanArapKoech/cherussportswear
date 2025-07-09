@@ -2,11 +2,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Product Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h1>Product Management Dashboard</h1>
-  <p>Product list.</p>
+    <div class="container">
+        <header>
+            <h1>Product Management</h1>
+            <div class="header-buttons">
+                <button id="add-product-btn">Add New Product</button>
+                <button id="logout-btn">Logout</button>
+            </div>
+        </header>
+        
+        <table id="products-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>SKU</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Inventory</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>SNK-001</td>
+                    <td>Test Sneaker</td>
+                    <td>99.99</td>
+                    <td>0</td>
+                    <td>
+                        <button class="edit-btn" data-id="1">Edit</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal for creating/editing products -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add Product</h2>
+                <span class="close-btn">×</span>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <input type="hidden" id="product-id">
+                    <div class="form-group">
+                        <label for="name">Product Name</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sku">SKU</label>
+                        <input type="text" id="sku" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price (KES)</label>
+                        <input type="number" id="price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inventory">Inventory Count</label>
+                        <input type="number" id="inventory" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit">Save Product</button>
+                    <p id="modal-error-message" class="error"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/products.js"></script>
 </body>
 </html>

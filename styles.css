@@ -812,7 +812,6 @@ display: none;
         .login-card *::after {
             box-sizing: border-box;
         }
-        /* --- END FIX --- */
 
         .login-card {
             background: white;
@@ -1073,3 +1072,38 @@ display: none;
             }
         }
     
+
+       
+/* WHATSAPP FLOATING ACTION BUTTON (FAB) STYLES    */
+
+.whatsapp-fab {
+  /* --- Positioning --- */
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000; /* Ensures it's above other content like the footer */
+
+  /* --- Styling --- */
+  width: 60px;
+  height: 60px;
+  background-color: #25D366; /* Official WhatsApp Green */
+  color: #FFFFFF;
+  border-radius: 50%; /* Makes it a circle */
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none; /* Removes underline from the link */
+
+  /* --- Centering the icon --- */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* --- Icon Size --- */
+  font-size: 32px;
+
+  /* --- Smooth Hover Effect --- */
+  transition: transform 0.2s ease-in-out;
+}
+
+.whatsapp-fab:hover {
+  transform: scale(1.1); /* Slightly enlarges the button on hover */
+}

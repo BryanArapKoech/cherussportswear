@@ -567,9 +567,7 @@ document.addEventListener('DOMContentLoaded', function () {
                      // --- START: Store CSRF Token ---
         if (data.csrfToken) {
             sessionStorage.setItem('csrfToken', data.csrfToken);            
-            console.log('CSRF Token stored in sessionStorage:', 
-                data.csrfToken);
-        }
+                    }
         // --- END: Store CSRF Token ---
 
 
